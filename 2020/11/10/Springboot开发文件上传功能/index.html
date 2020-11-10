@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="Springboot开发文件上传功能服务端准备首先，需要在配置文件中配置上传路径，然后声明一个变量contextPath，并将文件路径属性注入，然后创建一个Controller：uploadHeader，这里我们以头像上传功能举例子来说明。 123456789101112131415161718192021222324252627282930313233343536373839404142@Val">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Springboot开发文件上传功能">
+<meta property="og:url" content="http://example.com/2020/11/10/Springboot%E5%BC%80%E5%8F%91%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E5%8A%9F%E8%83%BD/index.html">
+<meta property="og:site_name" content="protosskai的技术笔记">
+<meta property="og:description" content="Springboot开发文件上传功能服务端准备首先，需要在配置文件中配置上传路径，然后声明一个变量contextPath，并将文件路径属性注入，然后创建一个Controller：uploadHeader，这里我们以头像上传功能举例子来说明。 123456789101112131415161718192021222324252627282930313233343536373839404142@Val">
+<meta property="og:locale">
+<meta property="article:published_time" content="2020-11-10T12:11:50.000Z">
+<meta property="article:modified_time" content="2020-11-10T12:12:48.327Z">
+<meta property="article:author" content="protosskai">
+<meta property="article:tag" content="javaweb">
+<meta property="article:tag" content="Springboot">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2020/11/10/Springboot%E5%BC%80%E5%8F%91%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E5%8A%9F%E8%83%BD/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>Springboot开发文件上传功能 | protosskai的技术笔记</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">protosskai的技术笔记</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2020/11/10/Springboot%E5%BC%80%E5%8F%91%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E5%8A%9F%E8%83%BD/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="protosskai">
+      <meta itemprop="description" content="欢迎来到我的技术笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="protosskai的技术笔记">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Springboot开发文件上传功能
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2020-11-10 20:11:50 / Modified: 20:12:48" itemprop="dateCreated datePublished" datetime="2020-11-10T20:11:50+08:00">2020-11-10</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Springboot/" itemprop="url" rel="index"><span itemprop="name">Springboot</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="Springboot开发文件上传功能"><a href="#Springboot开发文件上传功能" class="headerlink" title="Springboot开发文件上传功能"></a>Springboot开发文件上传功能</h1><h3 id="服务端准备"><a href="#服务端准备" class="headerlink" title="服务端准备"></a>服务端准备</h3><p>首先，需要在配置文件中配置上传路径，然后声明一个变量<strong>contextPath</strong>，并将文件路径属性注入，然后创建一个Controller：<strong>uploadHeader</strong>，这里我们以头像上传功能举例子来说明。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Value(&quot;$&#123;community.path.upload&#125;&quot;)</span></span><br><span class="line">   <span class="keyword">private</span> String uploadPath;</span><br><span class="line"></span><br><span class="line">   <span class="meta">@Value(&quot;$&#123;community.path.domain&#125;&quot;)</span></span><br><span class="line">   <span class="keyword">private</span> String domain;</span><br><span class="line"></span><br><span class="line">   <span class="meta">@Value(&quot;$&#123;server.servlet.context-path&#125;&quot;)</span></span><br><span class="line">   <span class="keyword">private</span> String contextPath;</span><br><span class="line"></span><br><span class="line"><span class="meta">@RequestMapping(path = &quot;/upload&quot;, method = RequestMethod.POST)</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> String <span class="title">uploadHeader</span><span class="params">(MultipartFile headerImage, Model model)</span> </span>&#123;</span><br><span class="line">       <span class="keyword">if</span> (headerImage == <span class="keyword">null</span>) &#123;</span><br><span class="line">           model.addAttribute(<span class="string">&quot;error&quot;</span>, <span class="string">&quot;您还没有选择图片!&quot;</span>);</span><br><span class="line">           <span class="keyword">return</span> <span class="string">&quot;/site/setting&quot;</span>;</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       String fileName = headerImage.getOriginalFilename();</span><br><span class="line">       String suffix = fileName.substring(fileName.lastIndexOf(<span class="string">&quot;.&quot;</span>));</span><br><span class="line">       <span class="keyword">if</span> (StringUtils.isBlank(suffix)) &#123;</span><br><span class="line">           model.addAttribute(<span class="string">&quot;error&quot;</span>, <span class="string">&quot;文件的格式不正确!&quot;</span>);</span><br><span class="line">           <span class="keyword">return</span> <span class="string">&quot;/site/setting&quot;</span>;</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       <span class="comment">// 生成随机文件名</span></span><br><span class="line">       fileName = CommunityUtil.generateUUID() + suffix;</span><br><span class="line">       <span class="comment">// 确定文件存放的路径</span></span><br><span class="line">       File dest = <span class="keyword">new</span> File(uploadPath + <span class="string">&quot;/&quot;</span> + fileName);</span><br><span class="line">       <span class="keyword">try</span> &#123;</span><br><span class="line">           <span class="comment">// 存储文件</span></span><br><span class="line">           headerImage.transferTo(dest);</span><br><span class="line">       &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">           logger.error(<span class="string">&quot;上传文件失败: &quot;</span> + e.getMessage());</span><br><span class="line">           <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">&quot;上传文件失败,服务器发生异常!&quot;</span>, e);</span><br><span class="line">       &#125;</span><br><span class="line">       <span class="comment">// 更新当前用户的头像的路径(web访问路径)</span></span><br><span class="line">       <span class="comment">// http://localhost:8080/community/user/header/xxx.png</span></span><br><span class="line">       User user = hostHolder.getUser();</span><br><span class="line">       String headerUrl = domain + contextPath + <span class="string">&quot;/user/header/&quot;</span> + fileName;</span><br><span class="line">       userService.updateHeader(user.getId(), headerUrl);</span><br><span class="line"></span><br><span class="line">       <span class="keyword">return</span> <span class="string">&quot;redirect:/index&quot;</span>;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+
+<p>SpringMVC为我们提供了一个文件上传类，<strong>MultipartFile</strong>，如果是多个文件，就用数组来表示。首先，我利用文件后缀来判断文件格式是否正确，然后 给文件重新分配一个新的随机的名字。然后调用· <code> </code> <code>headerImage.transferTo(dest);</code>来进行文件上传。</p>
+<h3 id="前端页面准备"><a href="#前端页面准备" class="headerlink" title="前端页面准备"></a>前端页面准备</h3><p>前端需要定义一个表单，并且请求方法一定为POST，并且具备**enctype=”multipart/form-data”**这个属性。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">form</span> <span class="attr">class</span>=<span class="string">&quot;mt-5&quot;</span> <span class="attr">method</span>=<span class="string">&quot;post&quot;</span> <span class="attr">enctype</span>=<span class="string">&quot;multipart/form-data&quot;</span> <span class="attr">th:action</span>=<span class="string">&quot;@&#123;/user/upload&#125;&quot;</span>&gt;</span></span><br><span class="line">					<span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;form-group row mt-4&quot;</span>&gt;</span></span><br><span class="line">						<span class="tag">&lt;<span class="name">label</span> <span class="attr">for</span>=<span class="string">&quot;head-image&quot;</span> <span class="attr">class</span>=<span class="string">&quot;col-sm-2 col-form-label text-right&quot;</span>&gt;</span>选择头像:<span class="tag">&lt;/<span class="name">label</span>&gt;</span></span><br><span class="line">						<span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;col-sm-10&quot;</span>&gt;</span></span><br><span class="line">							<span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;custom-file&quot;</span>&gt;</span></span><br><span class="line">								<span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">&quot;file&quot;</span> <span class="attr">th:class</span>=<span class="string">&quot;|custom-file-input $&#123;error!=null?&#x27;is-invalid&#x27;:&#x27;&#x27;&#125;|&quot;</span></span></span><br><span class="line"><span class="tag">									   <span class="attr">id</span>=<span class="string">&quot;head-image&quot;</span> <span class="attr">name</span>=<span class="string">&quot;headerImage&quot;</span> <span class="attr">lang</span>=<span class="string">&quot;es&quot;</span> <span class="attr">required</span>=<span class="string">&quot;&quot;</span>&gt;</span></span><br><span class="line">								<span class="tag">&lt;<span class="name">label</span> <span class="attr">class</span>=<span class="string">&quot;custom-file-label&quot;</span> <span class="attr">for</span>=<span class="string">&quot;head-image&quot;</span> <span class="attr">data-browse</span>=<span class="string">&quot;文件&quot;</span>&gt;</span>选择一张图片<span class="tag">&lt;/<span class="name">label</span>&gt;</span></span><br><span class="line">								<span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;invalid-feedback&quot;</span> <span class="attr">th:text</span>=<span class="string">&quot;$&#123;error&#125;&quot;</span>&gt;</span></span><br><span class="line">									该账号不存在!</span><br><span class="line">								<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">							<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">						<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">					<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">					<span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;form-group row mt-4&quot;</span>&gt;</span></span><br><span class="line">						<span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;col-sm-2&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">						<span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;col-sm-10 text-center&quot;</span>&gt;</span></span><br><span class="line">							<span class="tag">&lt;<span class="name">button</span> <span class="attr">type</span>=<span class="string">&quot;submit&quot;</span> <span class="attr">class</span>=<span class="string">&quot;btn btn-info text-white form-control&quot;</span>&gt;</span>立即上传<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span><br><span class="line">						<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">					<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">				<span class="tag">&lt;/<span class="name">form</span>&gt;</span></span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/javaweb/" rel="tag"># javaweb</a>
+              <a href="/tags/Springboot/" rel="tag"># Springboot</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/11/10/Springboot%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/" rel="prev" title="Springboot环境搭建">
+      <i class="fa fa-chevron-left"></i> Springboot环境搭建
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Springboot%E5%BC%80%E5%8F%91%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E5%8A%9F%E8%83%BD"><span class="nav-number">1.</span> <span class="nav-text">Springboot开发文件上传功能</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%8D%E5%8A%A1%E7%AB%AF%E5%87%86%E5%A4%87"><span class="nav-number">1.0.1.</span> <span class="nav-text">服务端准备</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%89%8D%E7%AB%AF%E9%A1%B5%E9%9D%A2%E5%87%86%E5%A4%87"><span class="nav-number">1.0.2.</span> <span class="nav-text">前端页面准备</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">protosskai</p>
+  <div class="site-description" itemprop="description">欢迎来到我的技术笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">5</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">protosskai</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
