@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="Springboot事务管理事务的隔离性 常见的并发异常 第一类丢失更新，第二类丢失更新 脏读，不可重复读，幻读   常见的隔离级别 Read Uncommitted：读取未提交的数据 。 Read Committed：读取已提交的数据。  Repeatable Read：可重复读。  Serializable：串行化。     第一类丢失更新某一个事务的回滚，导致另外一个事务已更新的数据丢失了。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Springboot事务管理">
+<meta property="og:url" content="http://example.com/2020/11/10/Springboot%E4%BA%8B%E5%8A%A1%E7%AE%A1%E7%90%86/index.html">
+<meta property="og:site_name" content="protosskai的技术笔记">
+<meta property="og:description" content="Springboot事务管理事务的隔离性 常见的并发异常 第一类丢失更新，第二类丢失更新 脏读，不可重复读，幻读   常见的隔离级别 Read Uncommitted：读取未提交的数据 。 Read Committed：读取已提交的数据。  Repeatable Read：可重复读。  Serializable：串行化。     第一类丢失更新某一个事务的回滚，导致另外一个事务已更新的数据丢失了。">
+<meta property="og:locale">
+<meta property="article:published_time" content="2020-11-10T12:13:51.000Z">
+<meta property="article:modified_time" content="2020-11-10T12:14:33.604Z">
+<meta property="article:author" content="protosskai">
+<meta property="article:tag" content="事务">
+<meta property="article:tag" content="Springboot">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2020/11/10/Springboot%E4%BA%8B%E5%8A%A1%E7%AE%A1%E7%90%86/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>Springboot事务管理 | protosskai的技术笔记</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">protosskai的技术笔记</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2020/11/10/Springboot%E4%BA%8B%E5%8A%A1%E7%AE%A1%E7%90%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="protosskai">
+      <meta itemprop="description" content="欢迎来到我的技术笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="protosskai的技术笔记">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Springboot事务管理
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2020-11-10 20:13:51 / Modified: 20:14:33" itemprop="dateCreated datePublished" datetime="2020-11-10T20:13:51+08:00">2020-11-10</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Springboot/" itemprop="url" rel="index"><span itemprop="name">Springboot</span></a>
+                </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Springboot/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index"><span itemprop="name">数据库</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="Springboot事务管理"><a href="#Springboot事务管理" class="headerlink" title="Springboot事务管理"></a>Springboot事务管理</h1><h3 id="事务的隔离性"><a href="#事务的隔离性" class="headerlink" title="事务的隔离性"></a>事务的隔离性</h3><ul>
+<li>常见的并发异常<ul>
+<li>第一类丢失更新，第二类丢失更新</li>
+<li>脏读，不可重复读，幻读</li>
+</ul>
+</li>
+<li>常见的隔离级别<ul>
+<li>Read Uncommitted：读取未提交的数据 。</li>
+<li>Read Committed：读取已提交的数据。 </li>
+<li>Repeatable Read：可重复读。 </li>
+<li>Serializable：串行化。 </li>
+</ul>
+</li>
+</ul>
+<h4 id="第一类丢失更新"><a href="#第一类丢失更新" class="headerlink" title="第一类丢失更新"></a>第一类丢失更新</h4><p>某一个事务的回滚，导致另外一个事务已更新的数据丢失了。 </p>
+<table>
+<thead>
+<tr>
+<th>时刻</th>
+<th>事务1</th>
+<th>事务2</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>T1</td>
+<td>Read:N=10</td>
+<td></td>
+</tr>
+<tr>
+<td>T2</td>
+<td></td>
+<td>Read:N=10</td>
+</tr>
+<tr>
+<td>T3</td>
+<td></td>
+<td>Write:N=9</td>
+</tr>
+<tr>
+<td>T4</td>
+<td></td>
+<td>Commit:N=9</td>
+</tr>
+<tr>
+<td>T5</td>
+<td>Write:N=11</td>
+<td></td>
+</tr>
+<tr>
+<td>T6</td>
+<td>Rollback: N = 10</td>
+<td></td>
+</tr>
+</tbody></table>
+<p>可见，事务2本身正确提交了，没有回滚，但是事务1却触发了回滚，把正确提交的事务2给覆盖了，这就是第一类丢失更新。</p>
+<h4 id="第二类丢失更新"><a href="#第二类丢失更新" class="headerlink" title="第二类丢失更新"></a>第二类丢失更新</h4><p>某一个事务的提交，导致另外一个事务已更新的数据丢失了。 </p>
+<table>
+<thead>
+<tr>
+<th>时刻</th>
+<th>事务1</th>
+<th>事务2</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>T1</td>
+<td>Read: N = 10</td>
+<td></td>
+</tr>
+<tr>
+<td>T2</td>
+<td></td>
+<td>Read: N = 10</td>
+</tr>
+<tr>
+<td>T3</td>
+<td></td>
+<td>Write:N=9</td>
+</tr>
+<tr>
+<td>T4</td>
+<td></td>
+<td>Commit:N=9</td>
+</tr>
+<tr>
+<td>T5</td>
+<td>Write: N = 11</td>
+<td></td>
+</tr>
+<tr>
+<td>T6</td>
+<td>Commit: N = 11</td>
+<td></td>
+</tr>
+</tbody></table>
+<p>事务2也是正确的提交了，事务1也是正确提交了，但是由于二者并发进行，导致事务1的提交覆盖了事务2的提交，这是第二类丢失更新。</p>
+<h4 id="脏读"><a href="#脏读" class="headerlink" title="脏读"></a>脏读</h4><p>某一个事务，读取了另外一个事务未提交的数据。 </p>
+<table>
+<thead>
+<tr>
+<th>时刻</th>
+<th>事务1</th>
+<th>事务2</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>T1</td>
+<td>Read: N = 10</td>
+<td></td>
+</tr>
+<tr>
+<td>T2</td>
+<td>Write: N = 11</td>
+<td></td>
+</tr>
+<tr>
+<td>T3</td>
+<td></td>
+<td>Read: N = 11</td>
+</tr>
+<tr>
+<td>T4</td>
+<td>Rollback: N = 10</td>
+<td></td>
+</tr>
+</tbody></table>
+<p>T2时刻，事务1写入了N=11，但是没有提交。在T3时刻，事务2读取了事务1写入的N=11，但是事务1在T4时刻触发了回滚，导致N=10，这是事务2读取到的N的值就不正确了。这就是脏读。</p>
+<h4 id="不可重复读"><a href="#不可重复读" class="headerlink" title="不可重复读"></a>不可重复读</h4><p>某一个事务，对同一个数据前后读取的结果不一致。 </p>
+<table>
+<thead>
+<tr>
+<th>时刻</th>
+<th>事务1</th>
+<th>事务2</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>T1</td>
+<td>Read: N = 10</td>
+<td></td>
+</tr>
+<tr>
+<td>T2</td>
+<td></td>
+<td>Read: N = 10</td>
+</tr>
+<tr>
+<td>T3</td>
+<td>Write: N = 11</td>
+<td></td>
+</tr>
+<tr>
+<td>T4</td>
+<td>Commit: N = 11</td>
+<td></td>
+</tr>
+<tr>
+<td>T5</td>
+<td></td>
+<td>Read: N = 11</td>
+</tr>
+</tbody></table>
+<p>在T2时刻，事务2读取到了N=10,但是随后的T3,T4时刻，事务1将N更新为11，在T5时刻事务2又读取N=11，这时事务2读取到的N的值前后矛盾，这就是不可重复读。</p>
+<h4 id="幻读"><a href="#幻读" class="headerlink" title="幻读"></a>幻读</h4><p>某一个事务，对同一个表前后查询到的行数不一致。 </p>
+<table>
+<thead>
+<tr>
+<th>时刻</th>
+<th>事务1</th>
+<th>事务2</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>T1</td>
+<td></td>
+<td>Select: id &lt; 10 (1,2,3)</td>
+</tr>
+<tr>
+<td>T2</td>
+<td>Insert: id = 4</td>
+<td></td>
+</tr>
+<tr>
+<td>T3</td>
+<td>Commit: id = (1,2,3,4)</td>
+<td></td>
+</tr>
+<tr>
+<td>T4</td>
+<td></td>
+<td>Select: id &lt; 10 (1,2,3,4)</td>
+</tr>
+</tbody></table>
+<p>T1时刻事务2读取到了3行数据，而事务1在T2,T3时刻更新id为4行，在T4时刻事务2读取到id为4行。读取到的行数前后矛盾，这就是幻读。</p>
+<h3 id="事务的隔离级别"><a href="#事务的隔离级别" class="headerlink" title="事务的隔离级别"></a>事务的隔离级别</h3><table>
+<thead>
+<tr>
+<th>隔离级别</th>
+<th>第一类丢失更新</th>
+<th>脏读</th>
+<th>第二类丢失更新</th>
+<th>不可重复读</th>
+<th>幻读</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Read Uncommitted</td>
+<td>Y</td>
+<td>Y</td>
+<td>Y</td>
+<td>Y</td>
+<td>Y</td>
+</tr>
+<tr>
+<td>Read Committed</td>
+<td>N</td>
+<td>N</td>
+<td>Y</td>
+<td>Y</td>
+<td>Y</td>
+</tr>
+<tr>
+<td>Repeatable Read</td>
+<td>N</td>
+<td>N</td>
+<td>N</td>
+<td>N</td>
+<td>Y</td>
+</tr>
+<tr>
+<td>Serializable</td>
+<td>N</td>
+<td>N</td>
+<td>N</td>
+<td>N</td>
+<td>N</td>
+</tr>
+</tbody></table>
+<h4 id="事务隔离实现机制"><a href="#事务隔离实现机制" class="headerlink" title="事务隔离实现机制"></a>事务隔离实现机制</h4><ul>
+<li><p>悲观锁（数据库） </p>
+<ul>
+<li><p>共享锁（S锁） </p>
+<p>事务A对某数据加了共享锁后，其他事务只能对该数据加共享锁，但不能加排他锁。 </p>
+</li>
+<li><p>排他锁（X锁） </p>
+<p>事务A对某数据加了排他锁后，其他事务对该数据既不能加共享锁，也不能加排他锁。 </p>
+</li>
+</ul>
+</li>
+<li><p>乐观锁（自定义） </p>
+<ul>
+<li><p>版本号、时间戳等 </p>
+<p>在更新数据前，检查版本号是否发生变化。若变化则取消本次更新，否则就更新数据（版本号+1）。 </p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="事务的传播行为"><a href="#事务的传播行为" class="headerlink" title="事务的传播行为"></a>事务的传播行为</h3><p>事务的传播行为指的是：我有一个A方法，并且为A方法配置了一个隔离级别。然后我在A方法里面调用了B方法。但是我在B方法上也配置了隔离级别。那么，B方法该怎么选择策略进行回滚那？这就是传播行为。</p>
+<table>
+<thead>
+<tr>
+<th>传播行为类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>REQUIRED</td>
+<td>支持当前事务(外部事务),如果不存在则创建新事务.（就是以A方法的事务为准）</td>
+</tr>
+<tr>
+<td>REQUIRES_NEW</td>
+<td>创建一个新事务,并且暂停当前事务(外部事务).就是以B方法自己的事务隔离级别为准</td>
+</tr>
+<tr>
+<td>NESTED</td>
+<td>如果当前存在事务(外部事务),则嵌套在该事务中执行(独立的提交和回滚),否则就会REQUIRED一样.</td>
+</tr>
+</tbody></table>
+<h3 id="Spring事务管理"><a href="#Spring事务管理" class="headerlink" title="Spring事务管理"></a>Spring事务管理</h3><ul>
+<li>声明式事务 <ul>
+<li>通过XML配置，声明某方法的事务特征。 </li>
+<li>通过注解，声明某方法的事务特征。 </li>
+</ul>
+</li>
+<li>编程式事务 <ul>
+<li>通过 TransactionTemplate 管理事务， 并通过它执行数据库的操作。 </li>
+</ul>
+</li>
+</ul>
+<h4 id="Spring事务管理代码演示"><a href="#Spring事务管理代码演示" class="headerlink" title="Spring事务管理代码演示"></a>Spring事务管理代码演示</h4><h5 id="通过注解声明方法的事务"><a href="#通过注解声明方法的事务" class="headerlink" title="通过注解声明方法的事务"></a>通过注解声明方法的事务</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// REQUIRED: 支持当前事务(外部事务),如果不存在则创建新事务.</span></span><br><span class="line">   <span class="comment">// REQUIRES_NEW: 创建一个新事务,并且暂停当前事务(外部事务).</span></span><br><span class="line">   <span class="comment">// NESTED: 如果当前存在事务(外部事务),则嵌套在该事务中执行(独立的提交和回滚),否则就会REQUIRED一		样.</span></span><br><span class="line">   <span class="meta">@Transactional(isolation = Isolation.READ_COMMITTED, propagation = 			             Propagation.REQUIRED)</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> Object <span class="title">save1</span><span class="params">()</span> </span>&#123;</span><br><span class="line">       <span class="comment">// 新增用户</span></span><br><span class="line">       User user = <span class="keyword">new</span> User();</span><br><span class="line">       user.setUsername(<span class="string">&quot;alpha&quot;</span>);</span><br><span class="line">       user.setSalt(CommunityUtil.generateUUID().substring(<span class="number">0</span>, <span class="number">5</span>));</span><br><span class="line">       user.setPassword(CommunityUtil.md5(<span class="string">&quot;123&quot;</span> + user.getSalt()));</span><br><span class="line">       user.setEmail(<span class="string">&quot;alpha@qq.com&quot;</span>);</span><br><span class="line">       user.setHeaderUrl(<span class="string">&quot;http://image.nowcoder.com/head/99t.png&quot;</span>);</span><br><span class="line">       user.setCreateTime(<span class="keyword">new</span> Date());</span><br><span class="line">       userMapper.insertUser(user);</span><br><span class="line"></span><br><span class="line">       <span class="comment">// 新增帖子</span></span><br><span class="line">       DiscussPost post = <span class="keyword">new</span> DiscussPost();</span><br><span class="line">       post.setUserId(user.getId());</span><br><span class="line">       post.setTitle(<span class="string">&quot;Hello&quot;</span>);</span><br><span class="line">       post.setContent(<span class="string">&quot;新人报道!&quot;</span>);</span><br><span class="line">       post.setCreateTime(<span class="keyword">new</span> Date());</span><br><span class="line">       discussPostMapper.insertDiscussPost(post);</span><br><span class="line"></span><br><span class="line">       Integer.valueOf(<span class="string">&quot;abc&quot;</span>);</span><br><span class="line"></span><br><span class="line">       <span class="keyword">return</span> <span class="string">&quot;ok&quot;</span>;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+
+<p>通过**@Transactional**注解来指定事务的隔离级别和事务的传播行为。</p>
+<h5 id="通过编程用TransactionTemplate-来管理事务"><a href="#通过编程用TransactionTemplate-来管理事务" class="headerlink" title="通过编程用TransactionTemplate 来管理事务"></a>通过编程用TransactionTemplate 来管理事务</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">	<span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> TransactionTemplate transactionTemplate;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> Object <span class="title">save2</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        		transactionTemplate.setIsolationLevel(TransactionDefinition.ISOLATION_READ_COMMITTED);</span><br><span class="line">       transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> transactionTemplate.execute(<span class="keyword">new</span> TransactionCallback&lt;Object&gt;() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> Object <span class="title">doInTransaction</span><span class="params">(TransactionStatus status)</span> </span>&#123;</span><br><span class="line">                <span class="comment">// 新增用户</span></span><br><span class="line">                User user = <span class="keyword">new</span> User();</span><br><span class="line">                user.setUsername(<span class="string">&quot;beta&quot;</span>);</span><br><span class="line">                user.setSalt(CommunityUtil.generateUUID().substring(<span class="number">0</span>, <span class="number">5</span>));</span><br><span class="line">                user.setPassword(CommunityUtil.md5(<span class="string">&quot;123&quot;</span> + user.getSalt()));</span><br><span class="line">                user.setEmail(<span class="string">&quot;beta@qq.com&quot;</span>);</span><br><span class="line">                user.setHeaderUrl(<span class="string">&quot;http://image.nowcoder.com/head/999t.png&quot;</span>);</span><br><span class="line">                user.setCreateTime(<span class="keyword">new</span> Date());</span><br><span class="line">                userMapper.insertUser(user);</span><br><span class="line"></span><br><span class="line">                <span class="comment">// 新增帖子</span></span><br><span class="line">                DiscussPost post = <span class="keyword">new</span> DiscussPost();</span><br><span class="line">                post.setUserId(user.getId());</span><br><span class="line">                post.setTitle(<span class="string">&quot;你好&quot;</span>);</span><br><span class="line">                post.setContent(<span class="string">&quot;我是新人!&quot;</span>);</span><br><span class="line">                post.setCreateTime(<span class="keyword">new</span> Date());</span><br><span class="line">                discussPostMapper.insertDiscussPost(post);</span><br><span class="line"></span><br><span class="line">                Integer.valueOf(<span class="string">&quot;abc&quot;</span>);</span><br><span class="line"></span><br><span class="line">                <span class="keyword">return</span> <span class="string">&quot;ok&quot;</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E4%BA%8B%E5%8A%A1/" rel="tag"># 事务</a>
+              <a href="/tags/Springboot/" rel="tag"># Springboot</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/11/10/Springboot%E5%BC%80%E5%8F%91%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E5%8A%9F%E8%83%BD/" rel="prev" title="Springboot开发文件上传功能">
+      <i class="fa fa-chevron-left"></i> Springboot开发文件上传功能
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/11/10/Springboot%E4%BD%BF%E7%94%A8%E9%AA%8C%E8%AF%81%E7%A0%81-Kaptcha/" rel="next" title="Springboot使用验证码--Kaptcha">
+      Springboot使用验证码--Kaptcha <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Springboot%E4%BA%8B%E5%8A%A1%E7%AE%A1%E7%90%86"><span class="nav-number">1.</span> <span class="nav-text">Springboot事务管理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8B%E5%8A%A1%E7%9A%84%E9%9A%94%E7%A6%BB%E6%80%A7"><span class="nav-number">1.0.1.</span> <span class="nav-text">事务的隔离性</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AC%AC%E4%B8%80%E7%B1%BB%E4%B8%A2%E5%A4%B1%E6%9B%B4%E6%96%B0"><span class="nav-number">1.0.1.1.</span> <span class="nav-text">第一类丢失更新</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AC%AC%E4%BA%8C%E7%B1%BB%E4%B8%A2%E5%A4%B1%E6%9B%B4%E6%96%B0"><span class="nav-number">1.0.1.2.</span> <span class="nav-text">第二类丢失更新</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%84%8F%E8%AF%BB"><span class="nav-number">1.0.1.3.</span> <span class="nav-text">脏读</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%8D%E5%8F%AF%E9%87%8D%E5%A4%8D%E8%AF%BB"><span class="nav-number">1.0.1.4.</span> <span class="nav-text">不可重复读</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B9%BB%E8%AF%BB"><span class="nav-number">1.0.1.5.</span> <span class="nav-text">幻读</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8B%E5%8A%A1%E7%9A%84%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB"><span class="nav-number">1.0.2.</span> <span class="nav-text">事务的隔离级别</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BA%8B%E5%8A%A1%E9%9A%94%E7%A6%BB%E5%AE%9E%E7%8E%B0%E6%9C%BA%E5%88%B6"><span class="nav-number">1.0.2.1.</span> <span class="nav-text">事务隔离实现机制</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8B%E5%8A%A1%E7%9A%84%E4%BC%A0%E6%92%AD%E8%A1%8C%E4%B8%BA"><span class="nav-number">1.0.3.</span> <span class="nav-text">事务的传播行为</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Spring%E4%BA%8B%E5%8A%A1%E7%AE%A1%E7%90%86"><span class="nav-number">1.0.4.</span> <span class="nav-text">Spring事务管理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Spring%E4%BA%8B%E5%8A%A1%E7%AE%A1%E7%90%86%E4%BB%A3%E7%A0%81%E6%BC%94%E7%A4%BA"><span class="nav-number">1.0.4.1.</span> <span class="nav-text">Spring事务管理代码演示</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E9%80%9A%E8%BF%87%E6%B3%A8%E8%A7%A3%E5%A3%B0%E6%98%8E%E6%96%B9%E6%B3%95%E7%9A%84%E4%BA%8B%E5%8A%A1"><span class="nav-number">1.0.4.1.1.</span> <span class="nav-text">通过注解声明方法的事务</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E9%80%9A%E8%BF%87%E7%BC%96%E7%A8%8B%E7%94%A8TransactionTemplate-%E6%9D%A5%E7%AE%A1%E7%90%86%E4%BA%8B%E5%8A%A1"><span class="nav-number">1.0.4.1.2.</span> <span class="nav-text">通过编程用TransactionTemplate 来管理事务</span></a></li></ol></li></ol></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">protosskai</p>
+  <div class="site-description" itemprop="description">欢迎来到我的技术笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">9</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">protosskai</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
