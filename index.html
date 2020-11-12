@@ -189,7 +189,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2020-11-12 14:41:19 / Modified: 15:11:22" itemprop="dateCreated datePublished" datetime="2020-11-12T14:41:19+08:00">2020-11-12</time>
+              <time title="Created: 2020-11-12 14:41:19 / Modified: 16:15:13" itemprop="dateCreated datePublished" datetime="2020-11-12T14:41:19+08:00">2020-11-12</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -237,6 +237,22 @@
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /usr/share/fonts/DejaVuSansMono</span><br><span class="line">sudo mkfontscale <span class="comment"># 生成核心字体信息</span></span><br><span class="line">sudo mkfontdir <span class="comment"># 生成字体文件夹</span></span><br><span class="line">sudo fc-cache -fv <span class="comment"># 刷新系统字体缓存</span></span><br></pre></td></tr></table></figure>
 
 <p>按照以上步骤操作后，图标字体就被安装到系统中了，下一步就是要给终端设置刚刚安装好的字体。具体方法根据你是用的终端来设置。</p>
+<h2 id="常用的操作"><a href="#常用的操作" class="headerlink" title="常用的操作"></a>常用的操作</h2><h3 id="快捷键"><a href="#快捷键" class="headerlink" title="快捷键"></a>快捷键</h3><p>Spacevim的leader键为反斜杠\，SPC键为空格。在普通模式下，按下空格后，等待一个间隔，就会出现提示菜单来提示后续的快捷键，当我们忘记某个快捷键时可以利用此方式来查看。</p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/BxqK9f"><img src="https://s3.ax1x.com/2020/11/12/BxqK9f.png" alt="BxqK9f.png"></a></p>
+<h3 id="常用快捷键"><a href="#常用快捷键" class="headerlink" title="常用快捷键"></a>常用快捷键</h3><p>使用文档：<a target="_blank" rel="noopener" href="https://spacevim.org/cn/documentation/">https://spacevim.org/cn/documentation/</a></p>
+<h4 id="窗口管理"><a href="#窗口管理" class="headerlink" title="窗口管理"></a>窗口管理</h4><p>常用的窗口管理快捷键有一个统一的前缀，默认的前缀 <code>[Window]</code> 是按键 <code>s</code>，可以在配置文件中通过修改 SpaceVim 选项 <code>window_leader</code> 的值来设为其它按键：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[options]</span><br><span class="line">    windows_leader &#x3D; &quot;s&quot;</span><br></pre></td></tr></table></figure>
+
+<p>Ctrl加方向键可以切换窗口</p>
+<p>q  关闭当前窗口</p>
+<p><code>[Window]</code> v 水平分屏</p>
+<p><code>[Window]</code> g 垂直分屏</p>
+<p><code>[Window]</code> t  新建标签页 </p>
+<p>F3 打开文件管理器</p>
+<h4 id="滚动操作"><a href="#滚动操作" class="headerlink" title="滚动操作"></a>滚动操作</h4><p>Ctrl e  向下滚动</p>
+<p>Ctrl y 向上滚动</p>
+<p>Ctrl f 向下翻页</p>
+<p>Ctrl b 向上翻页</p>
 
       
     </div>
