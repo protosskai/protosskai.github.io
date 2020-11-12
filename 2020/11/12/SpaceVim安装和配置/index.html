@@ -20,23 +20,24 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="springboot异常处理对于http错误状态码的默认处理对于http状态码，springboot自动配置了一个简易的处理方法。在templates文件夹下面建立一个名为error的文件夹，然后在里面放入文件名格式为“状态码.html”的文件，当发生对应的错误时，springboot就会帮助我们自动返回相应的页面。  利用@ControllerAdvice注解进行异常处理当控制器出现异常的时候，">
+  <meta name="description" content="SpaceVim的安装和配置为什么选择Vim因为经常有在linux下面编写代码的需求。这里之所以选择vim而不是专用的IDE是因为时常会以ssh的形式连接到服务器去编写代码，所以图形界面并不都是支持的，所以抽空学习了一下vim。简单的熟悉了一下vim的基本使用方法之后，发现vim配置起来十分的繁琐，而我又不想牵扯太多的精力在vim的配置上面，所以就使用了这个比较方便的Spacevim项目，这个项目">
 <meta property="og:type" content="article">
-<meta property="og:title" content="springboot异常处理">
-<meta property="og:url" content="http://example.com/2020/11/10/springboot%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86/index.html">
+<meta property="og:title" content="SpaceVim安装和配置">
+<meta property="og:url" content="http://example.com/2020/11/12/SpaceVim%E5%AE%89%E8%A3%85%E5%92%8C%E9%85%8D%E7%BD%AE/index.html">
 <meta property="og:site_name" content="protosskai的技术笔记">
-<meta property="og:description" content="springboot异常处理对于http错误状态码的默认处理对于http状态码，springboot自动配置了一个简易的处理方法。在templates文件夹下面建立一个名为error的文件夹，然后在里面放入文件名格式为“状态码.html”的文件，当发生对应的错误时，springboot就会帮助我们自动返回相应的页面。  利用@ControllerAdvice注解进行异常处理当控制器出现异常的时候，">
+<meta property="og:description" content="SpaceVim的安装和配置为什么选择Vim因为经常有在linux下面编写代码的需求。这里之所以选择vim而不是专用的IDE是因为时常会以ssh的形式连接到服务器去编写代码，所以图形界面并不都是支持的，所以抽空学习了一下vim。简单的熟悉了一下vim的基本使用方法之后，发现vim配置起来十分的繁琐，而我又不想牵扯太多的精力在vim的配置上面，所以就使用了这个比较方便的Spacevim项目，这个项目">
 <meta property="og:locale">
-<meta property="og:image" content="https://s2.ax1x.com/2019/10/07/u2mKIS.png">
-<meta property="article:published_time" content="2020-11-10T12:15:55.000Z">
-<meta property="article:modified_time" content="2020-11-10T12:16:25.649Z">
+<meta property="og:image" content="http://example.com/2020/11/12/SpaceVim%E5%AE%89%E8%A3%85%E5%92%8C%E9%85%8D%E7%BD%AE/imgs/1.png">
+<meta property="og:image" content="http://example.com/2020/11/12/SpaceVim%E5%AE%89%E8%A3%85%E5%92%8C%E9%85%8D%E7%BD%AE/imgs/2.png">
+<meta property="article:published_time" content="2020-11-12T06:41:19.000Z">
+<meta property="article:modified_time" content="2020-11-12T07:07:46.410Z">
 <meta property="article:author" content="protosskai">
-<meta property="article:tag" content="Springboot">
-<meta property="article:tag" content="异常处理">
+<meta property="article:tag" content="SpaceVim">
+<meta property="article:tag" content="vim">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://s2.ax1x.com/2019/10/07/u2mKIS.png">
+<meta name="twitter:image" content="http://example.com/2020/11/12/SpaceVim%E5%AE%89%E8%A3%85%E5%92%8C%E9%85%8D%E7%BD%AE/imgs/1.png">
 
-<link rel="canonical" href="http://example.com/2020/11/10/springboot%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86/">
+<link rel="canonical" href="http://example.com/2020/11/12/SpaceVim%E5%AE%89%E8%A3%85%E5%92%8C%E9%85%8D%E7%BD%AE/">
 
 
 <script id="page-configurations">
@@ -49,7 +50,7 @@
   };
 </script>
 
-  <title>springboot异常处理 | protosskai的技术笔记</title>
+  <title>SpaceVim安装和配置 | protosskai的技术笔记</title>
   
 
 
@@ -171,7 +172,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2020/11/10/springboot%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2020/11/12/SpaceVim%E5%AE%89%E8%A3%85%E5%92%8C%E9%85%8D%E7%BD%AE/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -184,7 +185,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          springboot异常处理
+          SpaceVim安装和配置
         </h1>
 
         <div class="post-meta">
@@ -195,7 +196,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2020-11-10 20:15:55 / Modified: 20:16:25" itemprop="dateCreated datePublished" datetime="2020-11-10T20:15:55+08:00">2020-11-10</time>
+              <time title="Created: 2020-11-12 14:41:19 / Modified: 15:07:46" itemprop="dateCreated datePublished" datetime="2020-11-12T14:41:19+08:00">2020-11-12</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -203,7 +204,7 @@
               </span>
               <span class="post-meta-item-text">In</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Springboot/" itemprop="url" rel="index"><span itemprop="name">Springboot</span></a>
+                  <a href="/categories/vim/" itemprop="url" rel="index"><span itemprop="name">vim</span></a>
                 </span>
             </span>
 
@@ -218,16 +219,31 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="springboot异常处理"><a href="#springboot异常处理" class="headerlink" title="springboot异常处理"></a>springboot异常处理</h1><h3 id="对于http错误状态码的默认处理"><a href="#对于http错误状态码的默认处理" class="headerlink" title="对于http错误状态码的默认处理"></a>对于http错误状态码的默认处理</h3><p>对于http状态码，springboot自动配置了一个简易的处理方法。在templates文件夹下面建立一个名为<strong>error</strong>的文件夹，然后在里面放入文件名格式为“状态码.html”的文件，当发生对应的错误时，springboot就会帮助我们自动返回相应的页面。</p>
-<p><img src="https://s2.ax1x.com/2019/10/07/u2mKIS.png" alt="u2mKIS.png"></p>
-<h3 id="利用-ControllerAdvice注解进行异常处理"><a href="#利用-ControllerAdvice注解进行异常处理" class="headerlink" title="利用@ControllerAdvice注解进行异常处理"></a>利用@ControllerAdvice注解进行异常处理</h3><p>当控制器出现异常的时候，@ControllerAdvice注解可以对Controller进行拦截。具体使用方法如下：</p>
-<p>我们首先新建一个类<strong>ExceptionAdvice</strong>，并且加上@ControllerAdvice注解。具体实现如下：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">	<span class="meta">@ControllerAdvice(annotations = Controller.class)</span></span><br><span class="line">	<span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ExceptionAdvice</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Logger logger = LoggerFactory.getLogger(ExceptionAdvice.class);</span><br><span class="line"></span><br><span class="line">    <span class="meta">@ExceptionHandler(&#123;Exception.class&#125;)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handleException</span><span class="params">(Exception e, HttpServletRequest request, 			            HttpServletResponse response)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        logger.error(<span class="string">&quot;服务器发生异常: &quot;</span> + e.getMessage());</span><br><span class="line">        <span class="keyword">for</span> (StackTraceElement element : e.getStackTrace()) &#123;</span><br><span class="line">            logger.error(element.toString());</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        String xRequestedWith = request.getHeader(<span class="string">&quot;x-requested-with&quot;</span>);</span><br><span class="line">        <span class="keyword">if</span> (<span class="string">&quot;XMLHttpRequest&quot;</span>.equals(xRequestedWith)) &#123;</span><br><span class="line">            response.setContentType(<span class="string">&quot;application/plain;charset=utf-8&quot;</span>);</span><br><span class="line">            PrintWriter writer = response.getWriter();</span><br><span class="line">            writer.write(CommunityUtil.getJSONString(<span class="number">1</span>, <span class="string">&quot;服务器异常!&quot;</span>));</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            response.sendRedirect(request.getContextPath() + <span class="string">&quot;/error&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+        <h1 id="SpaceVim的安装和配置"><a href="#SpaceVim的安装和配置" class="headerlink" title="SpaceVim的安装和配置"></a>SpaceVim的安装和配置</h1><h2 id="为什么选择Vim"><a href="#为什么选择Vim" class="headerlink" title="为什么选择Vim"></a>为什么选择Vim</h2><p>因为经常有在linux下面编写代码的需求。这里之所以选择vim而不是专用的IDE是因为时常会以ssh的形式连接到服务器去编写代码，所以图形界面并不都是支持的，所以抽空学习了一下vim。简单的熟悉了一下vim的基本使用方法之后，发现vim配置起来十分的繁琐，而我又不想牵扯太多的精力在vim的配置上面，所以就使用了这个比较方便的Spacevim项目，这个项目里面配置了许多常用的设置，并且安装了一些插件，可以做到开箱即用，因此选择了他，另外，华丽的界面和便捷的操作也是很重要的加分项。下面就是安装完毕后的样子。</p>
+<p><img src="./imgs/1.png"></p>
+<h2 id="SpaceVim的安装"><a href="#SpaceVim的安装" class="headerlink" title="SpaceVim的安装"></a>SpaceVim的安装</h2><p>Spacevim的官网：<a target="_blank" rel="noopener" href="https://spacevim.org/cn/">https://spacevim.org/cn/</a></p>
+<p>安装步骤：</p>
+<p>Spacevim的安装步骤很简单，按照官网的指引去做就可以了。</p>
+<p>首先，在Linux平台下面，下载官方的安装脚本并运行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -sLf https://spacevim.org/cn/install.sh | bash</span><br></pre></td></tr></table></figure>
 
-<pre><code>首先，**@ControllerAdvice(annotations = Controller.class)**说明只对被Controller注解标记的方法进行拦截。然后我们在**ExceptionAdvice**里面实现了**handleException**方法，方法名可以随便起，但是一定是public void，并且被**@ExceptionHandler**注解修饰。**@ExceptionHandler(&#123;Exception.class&#125;)**的参数为这个方法拦截的异常类型，这里我们用**Exception.class**表示拦截所有的异常。**ExceptionAdvice**的参数是spring自动为我们传入的，我们一般用这三个参数就够用了。
+<p>输入以上命令之后，就会自动安装Spacevim这个项目。安装完毕之后，第一次打开vim的时候就回去自动安装各种插件，并配置好环境。</p>
+<p>如果想要卸载的话，运行一下的命令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -sLf https://spacevim.org/cn/install.sh | bash -s -- -h</span><br></pre></td></tr></table></figure>
 
-然后，在**handleException**方法内，我们还需要对请求头进行判断，来确定是正常的get请求还是ajax请求。在这里，我们读取request的**x-requested-with**头，来判断请求类型。根据不同的请求类型来返回不同的行为，如果请求 是Ajax，我们直接获取输出流，对客户端浏览器进行写入json字符串。如果请求是正常请求，则重定向到错误界面。</code></pre>
-<p>​    </p>
+<p>上述命令会显示各种操作，找到卸载的操作并且输入命令即可。</p>
+<h2 id="字体的安装"><a href="#字体的安装" class="headerlink" title="字体的安装"></a>字体的安装</h2><p>SpaceVim会使用图标字体，因此如果当前系统下没有图标字体的话，那么打开vim的时候就会出现一部分文字的乱码，解决方法就是安装对应的图标字体，安装方法如下：</p>
+<p>这里以nerd-font为例，演示Linux下字体的安装</p>
+<p>nerd-font的git仓库链接：<a target="_blank" rel="noopener" href="https://github.com/ryanoasis/nerd-fonts/releases/tag/v2.1.0">https://github.com/ryanoasis/nerd-fonts/releases/tag/v2.1.0</a></p>
+<p>进入上述链接，找到你想要使用的一款字体，这里以<strong>DejaVuSansMono</strong>字体为例。</p>
+<p><img src="./imgs/2.png"></p>
+<p>下载完毕后，进入下载文件夹执行以下命令</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo unzip DejaVuSansMono.zip -d /usr/share/fonts/DejaVuSansMono</span><br></pre></td></tr></table></figure>
+
+<p>然后</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /usr/share/fonts/DejaVuSansMono</span><br><span class="line">sudo mkfontscale <span class="comment"># 生成核心字体信息</span></span><br><span class="line">sudo mkfontdir <span class="comment"># 生成字体文件夹</span></span><br><span class="line">sudo fc-cache -fv <span class="comment"># 刷新系统字体缓存</span></span><br></pre></td></tr></table></figure>
+
+<p>按照以上步骤操作后，图标字体就被安装到系统中了，下一步就是要给终端设置刚刚安装好的字体。具体方法根据你是用的终端来设置。</p>
 
     </div>
 
@@ -237,8 +253,8 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/Springboot/" rel="tag"># Springboot</a>
-              <a href="/tags/%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86/" rel="tag"># 异常处理</a>
+              <a href="/tags/SpaceVim/" rel="tag"># SpaceVim</a>
+              <a href="/tags/vim/" rel="tag"># vim</a>
           </div>
 
         
@@ -247,13 +263,10 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2020/11/10/Springboot%E4%BD%BF%E7%94%A8%E9%AA%8C%E8%AF%81%E7%A0%81-Kaptcha/" rel="prev" title="Springboot使用验证码--Kaptcha">
-      <i class="fa fa-chevron-left"></i> Springboot使用验证码--Kaptcha
+    <a href="/2020/11/10/Springboot%E4%BD%BF%E7%94%A8redis/" rel="prev" title="Springboot使用redis">
+      <i class="fa fa-chevron-left"></i> Springboot使用redis
     </a></div>
-      <div class="post-nav-item">
-    <a href="/2020/11/10/Springboot%E4%BD%BF%E7%94%A8redis/" rel="next" title="Springboot使用redis">
-      Springboot使用redis <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -312,7 +325,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#springboot%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86"><span class="nav-number">1.</span> <span class="nav-text">springboot异常处理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AF%B9%E4%BA%8Ehttp%E9%94%99%E8%AF%AF%E7%8A%B6%E6%80%81%E7%A0%81%E7%9A%84%E9%BB%98%E8%AE%A4%E5%A4%84%E7%90%86"><span class="nav-number">1.0.1.</span> <span class="nav-text">对于http错误状态码的默认处理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A9%E7%94%A8-ControllerAdvice%E6%B3%A8%E8%A7%A3%E8%BF%9B%E8%A1%8C%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86"><span class="nav-number">1.0.2.</span> <span class="nav-text">利用@ControllerAdvice注解进行异常处理</span></a></li></ol></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#SpaceVim%E7%9A%84%E5%AE%89%E8%A3%85%E5%92%8C%E9%85%8D%E7%BD%AE"><span class="nav-number">1.</span> <span class="nav-text">SpaceVim的安装和配置</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E9%80%89%E6%8B%A9Vim"><span class="nav-number">1.1.</span> <span class="nav-text">为什么选择Vim</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SpaceVim%E7%9A%84%E5%AE%89%E8%A3%85"><span class="nav-number">1.2.</span> <span class="nav-text">SpaceVim的安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%97%E4%BD%93%E7%9A%84%E5%AE%89%E8%A3%85"><span class="nav-number">1.3.</span> <span class="nav-text">字体的安装</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 

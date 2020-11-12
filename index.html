@@ -164,6 +164,98 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2020/11/12/SpaceVim%E5%AE%89%E8%A3%85%E5%92%8C%E9%85%8D%E7%BD%AE/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="protosskai">
+      <meta itemprop="description" content="欢迎来到我的技术笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="protosskai的技术笔记">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/11/12/SpaceVim%E5%AE%89%E8%A3%85%E5%92%8C%E9%85%8D%E7%BD%AE/" class="post-title-link" itemprop="url">SpaceVim安装和配置</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2020-11-12 14:41:19 / Modified: 15:07:46" itemprop="dateCreated datePublished" datetime="2020-11-12T14:41:19+08:00">2020-11-12</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/vim/" itemprop="url" rel="index"><span itemprop="name">vim</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="SpaceVim的安装和配置"><a href="#SpaceVim的安装和配置" class="headerlink" title="SpaceVim的安装和配置"></a>SpaceVim的安装和配置</h1><h2 id="为什么选择Vim"><a href="#为什么选择Vim" class="headerlink" title="为什么选择Vim"></a>为什么选择Vim</h2><p>因为经常有在linux下面编写代码的需求。这里之所以选择vim而不是专用的IDE是因为时常会以ssh的形式连接到服务器去编写代码，所以图形界面并不都是支持的，所以抽空学习了一下vim。简单的熟悉了一下vim的基本使用方法之后，发现vim配置起来十分的繁琐，而我又不想牵扯太多的精力在vim的配置上面，所以就使用了这个比较方便的Spacevim项目，这个项目里面配置了许多常用的设置，并且安装了一些插件，可以做到开箱即用，因此选择了他，另外，华丽的界面和便捷的操作也是很重要的加分项。下面就是安装完毕后的样子。</p>
+<p><img src="./imgs/1.png"></p>
+<h2 id="SpaceVim的安装"><a href="#SpaceVim的安装" class="headerlink" title="SpaceVim的安装"></a>SpaceVim的安装</h2><p>Spacevim的官网：<a target="_blank" rel="noopener" href="https://spacevim.org/cn/">https://spacevim.org/cn/</a></p>
+<p>安装步骤：</p>
+<p>Spacevim的安装步骤很简单，按照官网的指引去做就可以了。</p>
+<p>首先，在Linux平台下面，下载官方的安装脚本并运行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -sLf https://spacevim.org/cn/install.sh | bash</span><br></pre></td></tr></table></figure>
+
+<p>输入以上命令之后，就会自动安装Spacevim这个项目。安装完毕之后，第一次打开vim的时候就回去自动安装各种插件，并配置好环境。</p>
+<p>如果想要卸载的话，运行一下的命令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -sLf https://spacevim.org/cn/install.sh | bash -s -- -h</span><br></pre></td></tr></table></figure>
+
+<p>上述命令会显示各种操作，找到卸载的操作并且输入命令即可。</p>
+<h2 id="字体的安装"><a href="#字体的安装" class="headerlink" title="字体的安装"></a>字体的安装</h2><p>SpaceVim会使用图标字体，因此如果当前系统下没有图标字体的话，那么打开vim的时候就会出现一部分文字的乱码，解决方法就是安装对应的图标字体，安装方法如下：</p>
+<p>这里以nerd-font为例，演示Linux下字体的安装</p>
+<p>nerd-font的git仓库链接：<a target="_blank" rel="noopener" href="https://github.com/ryanoasis/nerd-fonts/releases/tag/v2.1.0">https://github.com/ryanoasis/nerd-fonts/releases/tag/v2.1.0</a></p>
+<p>进入上述链接，找到你想要使用的一款字体，这里以<strong>DejaVuSansMono</strong>字体为例。</p>
+<p><img src="./imgs/2.png"></p>
+<p>下载完毕后，进入下载文件夹执行以下命令</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo unzip DejaVuSansMono.zip -d /usr/share/fonts/DejaVuSansMono</span><br></pre></td></tr></table></figure>
+
+<p>然后</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /usr/share/fonts/DejaVuSansMono</span><br><span class="line">sudo mkfontscale <span class="comment"># 生成核心字体信息</span></span><br><span class="line">sudo mkfontdir <span class="comment"># 生成字体文件夹</span></span><br><span class="line">sudo fc-cache -fv <span class="comment"># 刷新系统字体缓存</span></span><br></pre></td></tr></table></figure>
+
+<p>按照以上步骤操作后，图标字体就被安装到系统中了，下一步就是要给终端设置刚刚安装好的字体。具体方法根据你是用的终端来设置。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="http://example.com/2020/11/10/Springboot%E4%BD%BF%E7%94%A8redis/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1301,20 +1393,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">9</span>
+          <span class="site-state-item-count">10</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-count">6</span>
         <span class="site-state-item-name">categories</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-count">13</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
