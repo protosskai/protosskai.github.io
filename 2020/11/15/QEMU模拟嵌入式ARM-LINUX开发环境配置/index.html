@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="QEMU模拟嵌入式ARM LINUX开发环境配置参考：https:&#x2F;&#x2F;blog.csdn.net&#x2F;zhvngchvng&#x2F;article&#x2F;details&#x2F;107856401#2Linux_35 开发环境：UBUNTU 20.04 64位 前言首先，我们需要了解一些基本概念：arm交叉编译器：在主机上编译能够在arm开发板上运行的代码。linux内核：linux运行的核心代码。linux内核模块：动态">
+<meta property="og:type" content="article">
+<meta property="og:title" content="QEMU模拟嵌入式ARM LINUX开发环境配置">
+<meta property="og:url" content="http://example.com/2020/11/15/QEMU%E6%A8%A1%E6%8B%9F%E5%B5%8C%E5%85%A5%E5%BC%8FARM-LINUX%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE/index.html">
+<meta property="og:site_name" content="protosskai的技术笔记">
+<meta property="og:description" content="QEMU模拟嵌入式ARM LINUX开发环境配置参考：https:&#x2F;&#x2F;blog.csdn.net&#x2F;zhvngchvng&#x2F;article&#x2F;details&#x2F;107856401#2Linux_35 开发环境：UBUNTU 20.04 64位 前言首先，我们需要了解一些基本概念：arm交叉编译器：在主机上编译能够在arm开发板上运行的代码。linux内核：linux运行的核心代码。linux内核模块：动态">
+<meta property="og:locale">
+<meta property="og:image" content="https://s3.ax1x.com/2020/11/15/DFGnit.md.png">
+<meta property="og:image" content="https://s3.ax1x.com/2020/11/15/DFGMz8.png">
+<meta property="og:image" content="https://s3.ax1x.com/2020/11/15/DFGNiq.png">
+<meta property="og:image" content="https://s3.ax1x.com/2020/11/15/DFGaWV.png">
+<meta property="og:image" content="https://s3.ax1x.com/2020/11/15/DFGdzT.png">
+<meta property="og:image" content="https://s3.ax1x.com/2020/11/15/DFGseJ.png">
+<meta property="og:image" content="https://s3.ax1x.com/2020/11/15/DFJ9Ts.png">
+<meta property="og:image" content="https://s3.ax1x.com/2020/11/15/DFJV6U.png">
+<meta property="og:image" content="https://s3.ax1x.com/2020/11/15/DFJqHJ.png">
+<meta property="og:image" content="https://s3.ax1x.com/2020/11/15/DFYdrF.png">
+<meta property="og:image" content="https://s3.ax1x.com/2020/11/15/DFY4VH.png">
+<meta property="og:image" content="https://s3.ax1x.com/2020/11/15/DFY7Gt.png">
+<meta property="og:image" content="https://s3.ax1x.com/2020/11/15/DFtseg.png">
+<meta property="og:image" content="https://s3.ax1x.com/2020/11/15/DFtomF.png">
+<meta property="article:published_time" content="2020-11-15T11:13:32.000Z">
+<meta property="article:modified_time" content="2020-11-15T13:42:07.743Z">
+<meta property="article:author" content="protosskai">
+<meta property="article:tag" content="qemu">
+<meta property="article:tag" content="linux">
+<meta property="article:tag" content="arm">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://s3.ax1x.com/2020/11/15/DFGnit.md.png">
+
+<link rel="canonical" href="http://example.com/2020/11/15/QEMU%E6%A8%A1%E6%8B%9F%E5%B5%8C%E5%85%A5%E5%BC%8FARM-LINUX%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>QEMU模拟嵌入式ARM LINUX开发环境配置 | protosskai的技术笔记</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">protosskai的技术笔记</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2020/11/15/QEMU%E6%A8%A1%E6%8B%9F%E5%B5%8C%E5%85%A5%E5%BC%8FARM-LINUX%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="protosskai">
+      <meta itemprop="description" content="欢迎来到我的技术笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="protosskai的技术笔记">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          QEMU模拟嵌入式ARM LINUX开发环境配置
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2020-11-15 19:13:32 / Modified: 21:42:07" itemprop="dateCreated datePublished" datetime="2020-11-15T19:13:32+08:00">2020-11-15</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B5%8C%E5%85%A5%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">嵌入式</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="QEMU模拟嵌入式ARM-LINUX开发环境配置"><a href="#QEMU模拟嵌入式ARM-LINUX开发环境配置" class="headerlink" title="QEMU模拟嵌入式ARM LINUX开发环境配置"></a>QEMU模拟嵌入式ARM LINUX开发环境配置</h1><p>参考：<a target="_blank" rel="noopener" href="https://blog.csdn.net/zhvngchvng/article/details/107856401#2Linux_35">https://blog.csdn.net/zhvngchvng/article/details/107856401#2Linux_35</a></p>
+<p>开发环境：UBUNTU 20.04 64位</p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>首先，我们需要了解一些基本概念：<br><strong>arm交叉编译器</strong>：在主机上编译能够在arm开发板上运行的代码。<br><strong>linux内核</strong>：linux运行的核心代码。<br><strong>linux内核模块</strong>：动态可加载内核模块，执行时依赖于内核，可以看做是内核的一个拓展，包含各种驱动程序（驱动开发就主要是这一块）。<br><strong>linux设备树</strong>：与硬件相关，用来描述芯片平台及板级差异的。<br><strong>根文件系统</strong>：内核启动时挂载的第一个文件系统，用来访问各种目录和文件，与内核互相独立。<br><strong>bootloader</strong>：开发板启动时的引导程序，一般使用u-boot来制作。<br>所以，为了在arm开发板上成功运行Linux系统，我们有如下三个方面的任务：</p>
+<ol>
+<li>制作bootloader；</li>
+<li>编译linux内核、linux内核模块、linux设备树；</li>
+<li>制作根文件系统。<br> 下面，我们使用qemu虚拟机来上手嵌入式linux的开发。</li>
+</ol>
+<h2 id="qemu和相关工具链的安装"><a href="#qemu和相关工具链的安装" class="headerlink" title="qemu和相关工具链的安装"></a>qemu和相关工具链的安装</h2><p>安装qemu有以下命令来完成：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt install qemu-system</span><br></pre></td></tr></table></figure>
+
+<p>在命令行输入以下内容安装ARM交叉编译工具：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install qemu</span><br></pre></td></tr></table></figure>
+
+<p>若需要安装较新版本的qemu，可以自行下载源码手动编译安装）<br>使用<code>qemu-system-</code>命令可以查看qemu支持的CPU架构。<br>使用<code>qemu-system-arm --version</code>命令可以查看qemu的版本。<br>使用<code>qemu-system-arm -M help</code>命令可以查看支持的开发板类别。</p>
+<h2 id="Linux内核与设备树编译"><a href="#Linux内核与设备树编译" class="headerlink" title="Linux内核与设备树编译"></a>Linux内核与设备树编译</h2><p>下载Linux内核：<a target="_blank" rel="noopener" href="https://www.kernel.org/">https://www.kernel.org/</a><br>选择长期维护的版本进行下载，这里选择5.3.6</p>
+<p>将下载下来的Linux内核拷贝到home目录，使用<code>tar xvf linux-5.3.6.tar.xz</code>进行解压缩。<br>解压好后输入<code>cd linux-5.3.6/</code>进入linux内核目录下</p>
+<p>修改Makefile：<code>vim Makefile</code><br>搜索交叉编译关键字，在vim编辑器中输入：<code>/CROSS_COMPILE</code>，然后回车<br>向下移动光标，找到关键字<strong>ARCH</strong>和<strong>CROSS_COMPILE</strong>，按i键进入插入文本模式，将其修改为如下内容：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ARCH	?= arm</span><br><span class="line"><span class="comment"># 注意不要忘记最后的小横线！</span></span><br><span class="line">CROSS_COMPILE	?= arm-linux-gnueabi-  </span><br></pre></td></tr></table></figure>
+
+<p>按Esc键切换为一般模式，输入<code>:wq</code>保存并退出。</p>
+<p>这里我们选择<strong>vexpress</strong>系列作为我们虚拟开发板，在linux内核目录下，输入<code>make vexpress_defconfig</code>对开发板进行配置，编译后生成.config文件.在make的过程中，可能会提示缺少flex和bison而失败，这时用apt安装即可。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo apt install flex</span><br><span class="line">sudo apt install bison</span><br></pre></td></tr></table></figure>
+
+<p>配置好后，编译<strong>内核</strong>，生成zImage镜像文件：<code>make zImage -j6</code>（多线程编译）<br>编译<strong>内核模块</strong>：<code>make modules -j4</code><br>编译<strong>设备树</strong>，获得dtb文件：<code>make dtbs</code><br>在linux内核目录下，使用qemu运行内核：<code>qemu-system-arm -M vexpress-a9 -m 512M -kernel arch/arm/boot/zImage -dtb arch/arm/boot/dts/vexpress-v2p-ca9.dtb -nographic -append &quot;console=ttyAMA0&quot;</code>，该命令指定了开发板类别、内存大小、内核zImage文件、dtb文件、无图形界面、串口。</p>
+<p>可以看到内核开始运行起来：</p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/DFGnit"><img src="https://s3.ax1x.com/2020/11/15/DFGnit.md.png" alt="DFGnit.md.png"></a></p>
+<p>但是卡在了挂载根文件系统处，别急，接着往下看。</p>
+<h2 id="busybox根文件系统制作"><a href="#busybox根文件系统制作" class="headerlink" title="busybox根文件系统制作"></a>busybox根文件系统制作</h2><p>首先，关掉之前的qemu进程</p>
+<p>使用ps命令查看qemu进程：<code>ps -a</code></p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/DFGMz8"><img src="https://s3.ax1x.com/2020/11/15/DFGMz8.png" alt="DFGMz8.png"></a></p>
+<p>要是没看到qemu进程，就不用kill，否则，kill掉qemu进程。kill 25906</p>
+<p>接下来，使用busybox制作根文件系统。<br>下载源码：<a target="_blank" rel="noopener" href="https://busybox.net/downloads/%EF%BC%8C%E4%B8%8B%E8%BD%BD%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC%E5%8D%B3%E5%8F%AF%E3%80%82">https://busybox.net/downloads/，下载最新版本即可。</a></p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/DFGNiq"><img src="https://s3.ax1x.com/2020/11/15/DFGNiq.png" alt="DFGNiq.png"></a></p>
+<p>解压缩：<code>tar xvf busybox-1.32.0.tar.bz2</code><br>进入busybox源码目录：<code>cd busybox-1.32.0/</code><br>修改Makefile：<code>vim Makefile</code><br>在vim编辑器中输入<code>/CROSS_COMPILE</code>查找关键字<strong>CROSS_COMPILE</strong>。<br>向下移动光标，找到关键字所在处，按i键切换到插入模式，并将值修改为<code>arm-linux-gnueabi-</code>：</p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/DFGaWV"><img src="https://s3.ax1x.com/2020/11/15/DFGaWV.png" alt="DFGaWV.png"></a></p>
+<p>按Esc退出插入模式，输入<code>/ARCH</code>查找关键字<strong>ARCH</strong>。<br>向下移动光标，找到关键字，按i切换到插入模式，并将值修改为<code>arm</code>：</p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/DFGdzT"><img src="https://s3.ax1x.com/2020/11/15/DFGdzT.png" alt="DFGdzT.png"></a></p>
+<p>按Esc键，输入<code>:wq</code>保存退出。<br>接着，输入命令<code>make defconfig</code>回车等待配置完毕。<br>也可以使用图形化配置<code>make menuconfig</code>，按回车然后进入Settings选项，找到Build Options，点y键将选项Build static binary（编译成静态）选中，然后退出：</p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/DFGseJ"><img src="https://s3.ax1x.com/2020/11/15/DFGseJ.png" alt="DFGseJ.png"></a></p>
+<p>当输入make menuconfig的时候，会提示找不到curses.h，这时候就要安装libncurses5-dev</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install libncurses5-dev</span><br></pre></td></tr></table></figure>
+
+<p>要是依赖有问题而安装失败的话，可以尝试安装aptitude</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt install aptitude</span><br></pre></td></tr></table></figure>
+
+<p>然后用aptitude安装这个库</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo aptitude install libncurses5-dev</span><br></pre></td></tr></table></figure>
+
+<p>aptitude会检测冲突后的解决方案，选择一个合适的即可。（若不合适的话，可以选择输入n来查看下一个方案）</p>
+<p>回到命令行，直接编译：<code>make -j4</code><br>然后执行<code>make install</code>，生成一个<strong>_install</strong>文件夹。<br>准备好后，下一步开始制作根文件系统。<br>输入<code>cd</code>回到home目录，新建目录<code>mkdir rootfs</code>，进入该目录<code>cd rootfs/</code>，将刚才生成的<strong>_install</strong>目录里的所有文件拷贝到该目录下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cp -r 你编译busybox的目录/_install/* ./</span><br></pre></td></tr></table></figure>
+
+<p>新建目录<code>mkdir lib</code>，将arm交叉编译器的库复制过来：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cp -r /usr/arm-linux-gnueabi/lib/* lib/</span><br></pre></td></tr></table></figure>
+
+<p>在rootfs目录下新建目录<code>mkdir dev/</code>，进入该目录<code>cd dev/</code>，创建节点<code>sudo mknod -m 666 tty1 c 4 1</code>（这里创建了一个串口字符设备，<strong>主设备号</strong>为4，<strong>从设备号</strong>为1）。<br>重复创建多个串口设备，注意分配好从设备号：(重复分配tty2-9，主设备仍未，从设备号为2-9)<br>创建一个控制台节点：<code>mknod -m 666 console c 5 1</code><br>创建一个空节点：<code>mknod -m 666 null c 1 3</code><br>创建好的字符设备用<code>ls</code>查看：</p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/DFJ9Ts"><img src="https://s3.ax1x.com/2020/11/15/DFJ9Ts.png" alt="DFJ9Ts.png"></a></p>
+<p>回到home目录，输入命令<code>dd if=/dev/zero of=rootfs.ext3 bs=1M count=32</code>生成虚拟SD卡系统镜像，可以得到一个rootfs.ext3文件。<br>格式化该镜像：<code>mkfs.ext3 rootfs.ext3</code><br>挂载该镜像到本地：<code>mount -t ext3 rootfs.ext3 /mnt -o loop</code><br>将之前准备的rootfs目录下的所有文件都拷贝到该镜像挂载点：<code>cp -r /home/zvcv/rootfs/* /mnt/</code><br>卸载：umount /mnt/<br>进入linux源码目录： <code>cd linux/</code><br>使用qemu启动内核：<code>qemu-system-arm -M vexpress-a9 -m 512M -kernel arch/arm/boot/zImage -dtb arch/arm/boot/dts/vexpress-v2p-ca9.dtb -nographic -append &quot;root=/dev/mmcblk0 rw console=ttyAMA0&quot; -sd /home/zvcv/rootfs.ext3</code>，这里比之前多指定了一个sd镜像。<br>点击回车，进入命令行，linux启动完毕。</p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/DFJV6U"><img src="https://s3.ax1x.com/2020/11/15/DFJV6U.png" alt="DFJV6U.png"></a></p>
+<p>若要图形化启动，使用命令：<code>qemu-system-arm -M vexpress-a9 -m 512M -kernel arch/arm/boot/zImage -dtb arch/arm/boot/dts/vexpress-v2p-ca9.dtb -append &quot;root=/dev/mmcblk0 rw console=tty0&quot; -sd rootfs.ext3</code></p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/DFJqHJ"><img src="https://s3.ax1x.com/2020/11/15/DFJqHJ.png" alt="DFJqHJ.png"></a></p>
+<h2 id="使用u-boot加载Linux内核"><a href="#使用u-boot加载Linux内核" class="headerlink" title="使用u-boot加载Linux内核"></a>使用u-boot加载Linux内核</h2><p>下载源码：<a target="_blank" rel="noopener" href="https://ftp.denx.de/pub/u-boot/">u-boot下载</a>，选择合适的版本即可。<br>（较新版本的u-boot需要更高版本的gcc来编译，为了方便起见，可以选用较早版本的u-boot）</p>
+<p><a target="_blank" rel="noopener" href="https://ftp.denx.de/pub/u-boot/u-boot-2017.05.tar.bz2">https://ftp.denx.de/pub/u-boot/u-boot-2017.05.tar.bz2</a></p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/DFYdrF"><img src="https://s3.ax1x.com/2020/11/15/DFYdrF.png" alt="DFYdrF.png"></a></p>
+<p>下载后解压缩：<code>tar xvf u-boot-2020.07.tar.bz2</code><br>切换到目录：<code>cd u-boot-2020.07</code><br>编辑Makefile文件：<code>vim Makefile</code><br>查找关键字：<code>/CROSS_COMPILE</code><br>向下翻，找到<strong>CROSS_COMPILE</strong>，按i键切换模式，修改为如下内容：</p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/DFY4VH"><img src="https://s3.ax1x.com/2020/11/15/DFY4VH.png" alt="DFY4VH.png"></a></p>
+<p>按Esc键退出插入模式，输入<code>:wq</code>保存并退出。<br>命令行输入<code>vim config.mk</code><br>查找关键字：<code>/ARCH</code><br>按i键切换模式，修改关键字的值：</p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/DFY7Gt"><img src="https://s3.ax1x.com/2020/11/15/DFY7Gt.png" alt="DFY7Gt.png"></a></p>
+<p>按Esc键退出插入模式，输入<code>:wq</code>保存并退出。<br>命令行输入命令进行配置：<code>make vexpress_ca9x4_defconfig</code><br>配置好后，编译：<code>make</code></p>
+<p>如果报以下的错的话</p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/DFtseg"><img src="https://s3.ax1x.com/2020/11/15/DFtseg.png" alt="DFtseg.png"></a></p>
+<p>可以尝试</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> CROSS_COMPILE=arm-linux-gnueabi-</span><br><span class="line"><span class="built_in">export</span> ARCH=arm</span><br></pre></td></tr></table></figure>
+
+<p>然后</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">make vexpress_ca9x4_defconfig</span><br><span class="line">make</span><br></pre></td></tr></table></figure>
+
+<p>若make时又出现如下错误：</p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/DFtomF"><img src="https://s3.ax1x.com/2020/11/15/DFtomF.png" alt="DFtomF.png"></a></p>
+<p>则需要安装device-tree-compiler：<code>sudo apt-get install device-tree-compiler</code></p>
+<p>make完成后，启动u-boot：<code>qemu-system-arm -M vexpress-a9 -m 512M -nographic -kernel u-boot</code>（注意：按下enter键后，会出现一个2s倒计时，询问你是否停止自动启动，直接回车就可以跳过启动过程中各种外设的加载）<br>输入命令测试：<code>help</code>，可以查看支持的命令。<br>运行成功后，删除该qemu进程：<code>ps -a</code>查找PID号，<code>kill</code>命令删除</p>
+<h2 id="搭建网络开发环境"><a href="#搭建网络开发环境" class="headerlink" title="搭建网络开发环境"></a>搭建网络开发环境</h2><p>待补充。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/qemu/" rel="tag"># qemu</a>
+              <a href="/tags/linux/" rel="tag"># linux</a>
+              <a href="/tags/arm/" rel="tag"># arm</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/11/12/SpaceVim%E5%AE%89%E8%A3%85%E5%92%8C%E9%85%8D%E7%BD%AE/" rel="prev" title="SpaceVim安装和配置">
+      <i class="fa fa-chevron-left"></i> SpaceVim安装和配置
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#QEMU%E6%A8%A1%E6%8B%9F%E5%B5%8C%E5%85%A5%E5%BC%8FARM-LINUX%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE"><span class="nav-number">1.</span> <span class="nav-text">QEMU模拟嵌入式ARM LINUX开发环境配置</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#qemu%E5%92%8C%E7%9B%B8%E5%85%B3%E5%B7%A5%E5%85%B7%E9%93%BE%E7%9A%84%E5%AE%89%E8%A3%85"><span class="nav-number">1.2.</span> <span class="nav-text">qemu和相关工具链的安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux%E5%86%85%E6%A0%B8%E4%B8%8E%E8%AE%BE%E5%A4%87%E6%A0%91%E7%BC%96%E8%AF%91"><span class="nav-number">1.3.</span> <span class="nav-text">Linux内核与设备树编译</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#busybox%E6%A0%B9%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E5%88%B6%E4%BD%9C"><span class="nav-number">1.4.</span> <span class="nav-text">busybox根文件系统制作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8u-boot%E5%8A%A0%E8%BD%BDLinux%E5%86%85%E6%A0%B8"><span class="nav-number">1.5.</span> <span class="nav-text">使用u-boot加载Linux内核</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%90%AD%E5%BB%BA%E7%BD%91%E7%BB%9C%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83"><span class="nav-number">1.6.</span> <span class="nav-text">搭建网络开发环境</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">protosskai</p>
+  <div class="site-description" itemprop="description">欢迎来到我的技术笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">11</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">protosskai</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
