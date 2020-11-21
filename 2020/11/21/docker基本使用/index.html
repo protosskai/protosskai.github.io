@@ -35,7 +35,7 @@
 <meta property="og:image" content="https://s3.ax1x.com/2020/11/21/D1aV0O.png">
 <meta property="og:image" content="https://s3.ax1x.com/2020/11/21/D1dIRs.png">
 <meta property="article:published_time" content="2020-11-21T07:17:49.000Z">
-<meta property="article:modified_time" content="2020-11-21T08:08:53.263Z">
+<meta property="article:modified_time" content="2020-11-21T16:08:36.502Z">
 <meta property="article:author" content="protosskai">
 <meta property="article:tag" content="docker">
 <meta name="twitter:card" content="summary">
@@ -198,10 +198,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2020-11-21 15:17:49 / Modified: 16:08:53" itemprop="dateCreated datePublished" datetime="2020-11-21T15:17:49+08:00">2020-11-21</time>
+              <time title="Created: 2020-11-21 15:17:49" itemprop="dateCreated datePublished" datetime="2020-11-21T15:17:49+08:00">2020-11-21</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-11-22 00:08:36" itemprop="dateModified" datetime="2020-11-22T00:08:36+08:00">2020-11-22</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -306,7 +312,122 @@
 
 
 
-<h2 id="构建镜像"><a href="#构建镜像" class="headerlink" title="构建镜像"></a>构建镜像</h2>
+<h2 id="构建镜像"><a href="#构建镜像" class="headerlink" title="构建镜像"></a>构建镜像</h2><h3 id="基本流程"><a href="#基本流程" class="headerlink" title="基本流程"></a>基本流程</h3><p>通过编写Dockerfile的形式可以构建镜像。下面就以搭建一个nginx服务器为例演示一下。</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span> ubuntu:<span class="number">18.04</span></span><br><span class="line"><span class="keyword">MAINTAINER</span> Foo Bar &lt;foo@bar.com&gt;</span><br><span class="line"></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> apt update</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> apt install -y nginx</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> <span class="built_in">echo</span> <span class="string">&quot;\ndaemon off;&quot;</span> &gt;&gt; /etc/nginx/nginx.conf</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> chown -R www-data:www-data /var/lib/nginx</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">VOLUME</span><span class="bash"> [<span class="string">&quot;/data&quot;</span>, <span class="string">&quot;/etc/nginx/site-enabled&quot;</span>, <span class="string">&quot;/var/log/nginx&quot;</span>]</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">WORKDIR</span><span class="bash"> /etc/nginx</span></span><br><span class="line"><span class="keyword">CMD</span><span class="bash"> [<span class="string">&quot;nginx&quot;</span>]</span></span><br><span class="line"><span class="keyword">EXPOSE</span> <span class="number">80</span></span><br><span class="line"><span class="keyword">EXPOSE</span> <span class="number">443</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>FROM:表示该镜像基于那个基础镜像构建。指令格式为：</p>
+  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">FROM 镜像名称:标签</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>MAINTAINER:指定镜像的维护者信息</p>
+</li>
+<li><p>RUN：运行shell脚本或者命令。</p>
+</li>
+<li><p>CMD：指定容器启动时执行的文件或shell脚本</p>
+</li>
+<li><p>WORKDIR：为CMD中设置的可执行文件设置运行目录</p>
+</li>
+<li><p>EXPOSE：与主机相连的端口号</p>
+</li>
+</ul>
+<p>在编写完Dockerfile之后，就可以利用该文件来构建镜像。命令格式如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker build 选项 Dockerfile路径</span><br></pre></td></tr></table></figure>
+
+<p>例如：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker build --tag hello:0.1 .</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>–tag指定镜像的名字和标签，若只设置镜像名称，镜像标签就为latest</li>
+</ul>
+<p>在创建完毕后，就可以docker run来运行镜像。</p>
+<h3 id="构建指令"><a href="#构建指令" class="headerlink" title="构建指令"></a>构建指令</h3><h4 id="Build-上下文的概念"><a href="#Build-上下文的概念" class="headerlink" title="Build 上下文的概念"></a>Build 上下文的概念</h4><p>在使用 docker build 命令通过 Dockerfile 创建镜像时，会产生一个 build 上下文(context)。所谓的 build 上下文就是 docker build 命令的 PATH 或 URL 指定的路径中的文件的集合。在镜像 build 过程中可以引用上下文中的任何文件，比如我们要介绍的 COPY 和 ADD 命令，就可以引用上下文中的文件。</p>
+<p>默认情况下 docker build -t testx . 命令中的 . 表示 build 上下文为当前目录。当然我们可以指定一个目录作为上下文，比如下面的命令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker build -t testx /home/nick/hc</span><br></pre></td></tr></table></figure>
+
+<p>我们指定 /home/nick/hc 目录为 build 上下文，默认情况下 docker 会使用在上下文的根目录下找到的 Dockerfile 文件。</p>
+<h4 id="FROM指令"><a href="#FROM指令" class="headerlink" title="FROM指令"></a>FROM指令</h4><p>FROM指令用于设置基础镜像，Dockerfile总是以已有镜像为基础，所以必须使用FROM命令。即可只使用镜像名称，也可以同时使用名称和标签。只使用名称时，标签自动为latest。镜像名称不可以省略。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">FROM 镜像名称:标签</span><br></pre></td></tr></table></figure>
+
+<h4 id="MAINTAINER指令"><a href="#MAINTAINER指令" class="headerlink" title="MAINTAINER指令"></a>MAINTAINER指令</h4><p>MAINTAINER指令用于设置镜像的创建者信息，格式自由。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MAINTAINER 创建者信息</span><br></pre></td></tr></table></figure>
+
+<h4 id="RUN指令"><a href="#RUN指令" class="headerlink" title="RUN指令"></a>RUN指令</h4><p>RUN指令用于在FROM中设置的镜像上面运行脚本或者命令。RUN运行结果会生成新的镜像。</p>
+<p>RUN指令有两种，一种是利用镜像内的/bin/sh程序执行命令，如果镜像内不存在/bin/sh，则无法使用，这时使用方法如下：</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">RUN</span><span class="bash"> 命令</span></span><br><span class="line"><span class="comment"># 例如</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> apt install -y nginx</span></span><br></pre></td></tr></table></figure>
+
+<p>第二种方式是不借助shell，直接执行可执行文件，方法如下：</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">RUN</span><span class="bash"> [<span class="string">&quot;程序&quot;</span>, <span class="string">&quot;参数一&quot;</span>, <span class="string">&quot;参数二&quot;</span>, <span class="string">&quot;参数N&quot;</span>]</span></span><br><span class="line"><span class="comment"># 例如</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> [<span class="string">&quot;apt&quot;</span>, <span class="string">&quot;install&quot;</span>, <span class="string">&quot;-y&quot;</span>, <span class="string">&quot;nginx&quot;</span>]</span></span><br></pre></td></tr></table></figure>
+
+
+
+<p>每个成功运行的RUN命令都会创建一个镜像，每个RUN的执行结果会被缓存，如果不想使用缓存结果，只需要在docker build命令中加入–no-cache即可</p>
+<h4 id="CMD指令"><a href="#CMD指令" class="headerlink" title="CMD指令"></a>CMD指令</h4><p>CMD指令用于设置容器启动时运行的脚本或者命令，即使用docker run 或者docker start时会执行的命令。在Dockerile文件中CMD命令只能使用一次。CMD的语法和RUN命令一样，就不重复了。</p>
+<h4 id="ENTRYPOINT指令："><a href="#ENTRYPOINT指令：" class="headerlink" title="ENTRYPOINT指令："></a>ENTRYPOINT指令：</h4><p>ENTRYPOINT的使用方法和CMD一样，功能也一样，都是用于设置容器启动时运行的脚本或者命令。二者的不同在于：</p>
+<ul>
+<li><p>在shell写法下，如果存在ENTRYPOINT 指令，那么CMD命令和docker run后面输入的指令都不会执行，会强制执行ENTRYPOINT后面的指令</p>
+</li>
+<li><p>在exec写法下，如果在ENTRYPOINT前面有CMD，那么CMD数组中的所有元素都会被当做ENTRYPOINT的参数，例如：</p>
+  <figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CMD</span><span class="bash"> [<span class="string">&quot;hello&quot;</span>]</span></span><br><span class="line"><span class="keyword">ENTRYPOINT</span><span class="bash"> [<span class="string">&quot;echo&quot;</span>]</span></span><br></pre></td></tr></table></figure>
+
+<p>  以上两句会输出一个”hello”字符串</p>
+</li>
+</ul>
+<h4 id="EXPOSE指令"><a href="#EXPOSE指令" class="headerlink" title="EXPOSE指令"></a>EXPOSE指令</h4><p>EXPOSE指令用来声明容器暴露出的端口，但并不会直接打开这些端口。他只是为了告诉别人容器中用到了哪些端口。如果想要在宿主机上访问这些端口，还需要通过docker -p 来映射端口。另外，当利用docker -P时，也会将EXPOSE的端口随机映射。</p>
+<h4 id="ENV指令"><a href="#ENV指令" class="headerlink" title="ENV指令"></a>ENV指令</h4><p>ENV指令用于设置环境变量。使用ENV设置的环境变量适用于RUN，CMD，ENTRYPOINT</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ENV</span> 环境变量 值</span><br><span class="line"><span class="keyword">ENV</span> GOPATH /go <span class="comment"># 设置GOPATH变量的值为/go</span></span><br><span class="line"><span class="keyword">ENV</span> PATH /go/bin:$PATH <span class="comment">#在PATH变量前面加上/go/bin:</span></span><br></pre></td></tr></table></figure>
+
+<p>在ENV设置完变量后，上述三个命令就可以访问了</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ENV</span> GOPATH /go <span class="comment"># 设置GOPATH变量的值为/go</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> <span class="built_in">echo</span> <span class="variable">$GOPATH</span></span></span><br></pre></td></tr></table></figure>
+
+<p>上面两句会打印出/go这个字符串</p>
+<h4 id="COPY指令"><a href="#COPY指令" class="headerlink" title="COPY指令"></a>COPY指令</h4><p>COPY指令会简单的将文件复制到镜像中。</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">COPY</span><span class="bash"> 要复制的文件的路径 文件要复制到镜像中的路径</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>要复制的文件的路径要以上下文</li>
+<li>要复制的文件的路径不能设置为网络URL</li>
+<li>要复制的文件的路径可以为目录。当设置为目录时，会复制目录下所有文件，另外也可以使用通配符复制特定文件</li>
+<li>文件要复制到镜像中的路径需要是绝对路径</li>
+<li>添加当前目录时，.dockerignore文件中设置的文件和目录会被忽略</li>
+</ul>
+<h4 id="ADD指令"><a href="#ADD指令" class="headerlink" title="ADD指令"></a>ADD指令</h4><p>ADD指令也用于向镜像中添加文件。下面列举和COPY的不同</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ADD 要复制的文件的路径 文件要复制到镜像中的路径</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>要复制的文件的路径</strong>可以为网络路径。</li>
+</ul>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ADD</span><span class="bash"> http://example.com/hello.sh /home/hello.sh</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>如果<strong>要复制的文件</strong>为压缩包时，ADD指令会自动解压缩并添加。但是如果从网络中下载一个压缩包时，不会解压缩。</li>
+</ul>
+<h4 id="VOLUME指令"><a href="#VOLUME指令" class="headerlink" title="VOLUME指令"></a>VOLUME指令</h4><p>VOLUME指令可以讲容器中的目录挂载到本机的目录上，这样容器中写入数据时就可以直接存储到宿主机上。</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">VOLUME</span><span class="bash"> 容器中的路径 <span class="comment">#方式一</span></span></span><br><span class="line"><span class="keyword">VOLUME</span><span class="bash"> [<span class="string">&quot;容器中的路径&quot;</span>,  <span class="string">&quot;宿主机中的路径&quot;</span>] <span class="comment">#方式二</span></span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>方式一这里的 /data 目录就会在运行时自动挂载为匿名卷，任何向 /data 中写入的信息都不会记录进容器存储层，从而保证了容器存储层的无状态化。当然，运行时可以覆盖这个挂载设置。比如：</p>
+  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -d -v mydata:/data 镜像名</span><br></pre></td></tr></table></figure>
+
+<p>  在这行命令中，就使用了 mydata 这个命名卷挂载到了 /data 这个位置，替代了 Dockerfile 中定义的匿名卷的挂载配置。</p>
+</li>
+<li><p>方式二会将容器中的路径挂载到宿主机中的路径。这样向容器中的目录就和宿主机中的目录共享了。</p>
+</li>
+</ul>
+<h4 id="USER指令"><a href="#USER指令" class="headerlink" title="USER指令"></a>USER指令</h4><p>USER指令用于设置运行命令的用户。用于RUN， CMD， ENTRYPOINT</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">USER</span> root</span><br></pre></td></tr></table></figure>
+
+<p>USER后面所有的RUN，CMD，ENTRYPOINT都会得到应用。中间可以使用USER命令更换用户</p>
+<h4 id="WORKDIR指令"><a href="#WORKDIR指令" class="headerlink" title="WORKDIR指令"></a>WORKDIR指令</h4><p>WORKDIR指令用于设置RUN，CMD，ENTRYPOINT命令的目录。</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">WORKDIR</span><span class="bash"> 路径</span></span><br></pre></td></tr></table></figure>
+
+<p>WORKDIR指令对之后的RUN，CMD，ENTRYPOINT都生效，中间可以用WORKDIR命令更换目录。</p>
+<p>WORKDIR指令也可以使用相对路径，最初相对的路径为/，之后每次相对的都是之前的路径</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">WORKDIR</span><span class="bash"> var <span class="comment"># 此时路径为/var</span></span></span><br><span class="line"><span class="keyword">WORKDIR</span><span class="bash"> www <span class="comment"># 此时路径为/var/www</span></span></span><br></pre></td></tr></table></figure>
+
+<h4 id="ONBUILD"><a href="#ONBUILD" class="headerlink" title="ONBUILD"></a>ONBUILD</h4><p>如果以当前镜像作为基础镜像时，ONBUILD就会在引用次镜像的Dockerfile的FROM指令后执行ONBUILD指令。</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ONBUILD</span> <span class="keyword">RUN</span><span class="bash"> touch hello.txt</span></span><br></pre></td></tr></table></figure>
+
+
     </div>
 
     
@@ -386,7 +507,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#docker%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8"><span class="nav-number">1.</span> <span class="nav-text">docker基本使用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C"><span class="nav-number">1.1.</span> <span class="nav-text">基本操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%90%9C%E7%B4%A2%E9%95%9C%E5%83%8F"><span class="nav-number">1.1.1.</span> <span class="nav-text">搜索镜像</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8B%E8%BD%BD%E9%95%9C%E5%83%8F"><span class="nav-number">1.1.2.</span> <span class="nav-text">下载镜像</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%97%E5%87%BA%E9%95%9C%E5%83%8F"><span class="nav-number">1.1.3.</span> <span class="nav-text">列出镜像</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E5%AE%B9%E5%99%A8"><span class="nav-number">1.1.4.</span> <span class="nav-text">创建容器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8B%E5%BD%93%E5%89%8D%E8%BF%90%E8%A1%8C%E7%9A%84%E5%AE%B9%E5%99%A8"><span class="nav-number">1.1.5.</span> <span class="nav-text">查看当前运行的容器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%81%9C%E6%AD%A2%E5%AE%B9%E5%99%A8"><span class="nav-number">1.1.6.</span> <span class="nav-text">停止容器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8%E5%AE%B9%E5%99%A8"><span class="nav-number">1.1.7.</span> <span class="nav-text">启动容器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%9E%E6%8E%A5%E5%88%B0%E5%AE%B9%E5%99%A8"><span class="nav-number">1.1.8.</span> <span class="nav-text">连接到容器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%96%E9%83%A8%E6%89%A7%E8%A1%8C%E5%AE%B9%E5%99%A8%E5%86%85%E9%83%A8%E5%91%BD%E4%BB%A4"><span class="nav-number">1.1.9.</span> <span class="nav-text">外部执行容器内部命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A0%E9%99%A4%E5%AE%B9%E5%99%A8"><span class="nav-number">1.1.10.</span> <span class="nav-text">删除容器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A0%E9%99%A4%E9%95%9C%E5%83%8F"><span class="nav-number">1.1.11.</span> <span class="nav-text">删除镜像</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9E%84%E5%BB%BA%E9%95%9C%E5%83%8F"><span class="nav-number">1.2.</span> <span class="nav-text">构建镜像</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#docker%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8"><span class="nav-number">1.</span> <span class="nav-text">docker基本使用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C"><span class="nav-number">1.1.</span> <span class="nav-text">基本操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%90%9C%E7%B4%A2%E9%95%9C%E5%83%8F"><span class="nav-number">1.1.1.</span> <span class="nav-text">搜索镜像</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8B%E8%BD%BD%E9%95%9C%E5%83%8F"><span class="nav-number">1.1.2.</span> <span class="nav-text">下载镜像</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%97%E5%87%BA%E9%95%9C%E5%83%8F"><span class="nav-number">1.1.3.</span> <span class="nav-text">列出镜像</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E5%AE%B9%E5%99%A8"><span class="nav-number">1.1.4.</span> <span class="nav-text">创建容器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8B%E5%BD%93%E5%89%8D%E8%BF%90%E8%A1%8C%E7%9A%84%E5%AE%B9%E5%99%A8"><span class="nav-number">1.1.5.</span> <span class="nav-text">查看当前运行的容器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%81%9C%E6%AD%A2%E5%AE%B9%E5%99%A8"><span class="nav-number">1.1.6.</span> <span class="nav-text">停止容器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8%E5%AE%B9%E5%99%A8"><span class="nav-number">1.1.7.</span> <span class="nav-text">启动容器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%9E%E6%8E%A5%E5%88%B0%E5%AE%B9%E5%99%A8"><span class="nav-number">1.1.8.</span> <span class="nav-text">连接到容器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%96%E9%83%A8%E6%89%A7%E8%A1%8C%E5%AE%B9%E5%99%A8%E5%86%85%E9%83%A8%E5%91%BD%E4%BB%A4"><span class="nav-number">1.1.9.</span> <span class="nav-text">外部执行容器内部命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A0%E9%99%A4%E5%AE%B9%E5%99%A8"><span class="nav-number">1.1.10.</span> <span class="nav-text">删除容器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A0%E9%99%A4%E9%95%9C%E5%83%8F"><span class="nav-number">1.1.11.</span> <span class="nav-text">删除镜像</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9E%84%E5%BB%BA%E9%95%9C%E5%83%8F"><span class="nav-number">1.2.</span> <span class="nav-text">构建镜像</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%B5%81%E7%A8%8B"><span class="nav-number">1.2.1.</span> <span class="nav-text">基本流程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9E%84%E5%BB%BA%E6%8C%87%E4%BB%A4"><span class="nav-number">1.2.2.</span> <span class="nav-text">构建指令</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Build-%E4%B8%8A%E4%B8%8B%E6%96%87%E7%9A%84%E6%A6%82%E5%BF%B5"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">Build 上下文的概念</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#FROM%E6%8C%87%E4%BB%A4"><span class="nav-number">1.2.2.2.</span> <span class="nav-text">FROM指令</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#MAINTAINER%E6%8C%87%E4%BB%A4"><span class="nav-number">1.2.2.3.</span> <span class="nav-text">MAINTAINER指令</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#RUN%E6%8C%87%E4%BB%A4"><span class="nav-number">1.2.2.4.</span> <span class="nav-text">RUN指令</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#CMD%E6%8C%87%E4%BB%A4"><span class="nav-number">1.2.2.5.</span> <span class="nav-text">CMD指令</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ENTRYPOINT%E6%8C%87%E4%BB%A4%EF%BC%9A"><span class="nav-number">1.2.2.6.</span> <span class="nav-text">ENTRYPOINT指令：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#EXPOSE%E6%8C%87%E4%BB%A4"><span class="nav-number">1.2.2.7.</span> <span class="nav-text">EXPOSE指令</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ENV%E6%8C%87%E4%BB%A4"><span class="nav-number">1.2.2.8.</span> <span class="nav-text">ENV指令</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#COPY%E6%8C%87%E4%BB%A4"><span class="nav-number">1.2.2.9.</span> <span class="nav-text">COPY指令</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ADD%E6%8C%87%E4%BB%A4"><span class="nav-number">1.2.2.10.</span> <span class="nav-text">ADD指令</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#VOLUME%E6%8C%87%E4%BB%A4"><span class="nav-number">1.2.2.11.</span> <span class="nav-text">VOLUME指令</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#USER%E6%8C%87%E4%BB%A4"><span class="nav-number">1.2.2.12.</span> <span class="nav-text">USER指令</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#WORKDIR%E6%8C%87%E4%BB%A4"><span class="nav-number">1.2.2.13.</span> <span class="nav-text">WORKDIR指令</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ONBUILD"><span class="nav-number">1.2.2.14.</span> <span class="nav-text">ONBUILD</span></a></li></ol></li></ol></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
