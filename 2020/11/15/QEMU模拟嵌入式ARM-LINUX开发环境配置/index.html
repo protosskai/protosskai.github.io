@@ -42,7 +42,7 @@
 <meta property="og:image" content="https://s3.ax1x.com/2020/11/15/DFtseg.png">
 <meta property="og:image" content="https://s3.ax1x.com/2020/11/15/DFtomF.png">
 <meta property="article:published_time" content="2020-11-15T11:13:32.000Z">
-<meta property="article:modified_time" content="2020-11-15T13:42:07.743Z">
+<meta property="article:modified_time" content="2020-11-16T15:58:39.034Z">
 <meta property="article:author" content="protosskai">
 <meta property="article:tag" content="qemu">
 <meta property="article:tag" content="linux">
@@ -207,10 +207,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2020-11-15 19:13:32 / Modified: 21:42:07" itemprop="dateCreated datePublished" datetime="2020-11-15T19:13:32+08:00">2020-11-15</time>
+              <time title="Created: 2020-11-15 19:13:32" itemprop="dateCreated datePublished" datetime="2020-11-15T19:13:32+08:00">2020-11-15</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-11-16 23:58:39" itemprop="dateModified" datetime="2020-11-16T23:58:39+08:00">2020-11-16</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -314,7 +320,7 @@
 <p><a target="_blank" rel="noopener" href="https://imgchr.com/i/DFtomF"><img src="https://s3.ax1x.com/2020/11/15/DFtomF.png" alt="DFtomF.png"></a></p>
 <p>则需要安装device-tree-compiler：<code>sudo apt-get install device-tree-compiler</code></p>
 <p>make完成后，启动u-boot：<code>qemu-system-arm -M vexpress-a9 -m 512M -nographic -kernel u-boot</code>（注意：按下enter键后，会出现一个2s倒计时，询问你是否停止自动启动，直接回车就可以跳过启动过程中各种外设的加载）<br>输入命令测试：<code>help</code>，可以查看支持的命令。<br>运行成功后，删除该qemu进程：<code>ps -a</code>查找PID号，<code>kill</code>命令删除</p>
-<h2 id="搭建网络开发环境"><a href="#搭建网络开发环境" class="headerlink" title="搭建网络开发环境"></a>搭建网络开发环境</h2><p>待补充。</p>
+<h2 id="搭建网络开发环境"><a href="#搭建网络开发环境" class="headerlink" title="搭建网络开发环境"></a>搭建网络开发环境</h2><p>首先需要配置虚拟网卡，用于分配给qemu。</p>
 
     </div>
 
@@ -338,7 +344,10 @@
     <a href="/2020/11/12/SpaceVim%E5%AE%89%E8%A3%85%E5%92%8C%E9%85%8D%E7%BD%AE/" rel="prev" title="SpaceVim安装和配置">
       <i class="fa fa-chevron-left"></i> SpaceVim安装和配置
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/2020/11/21/docker%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8/" rel="next" title="docker基本使用">
+      docker基本使用 <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -411,20 +420,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">11</span>
+          <span class="site-state-item-count">12</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-count">5</span>
         <span class="site-state-item-name">categories</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-count">17</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
