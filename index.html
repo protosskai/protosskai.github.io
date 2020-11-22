@@ -195,7 +195,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2020-11-22 00:08:36" itemprop="dateModified" datetime="2020-11-22T00:08:36+08:00">2020-11-22</time>
+                <time title="Modified: 2020-11-22 12:25:35" itemprop="dateModified" datetime="2020-11-22T12:25:35+08:00">2020-11-22</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -221,25 +221,25 @@
           <h1 id="docker基本使用"><a href="#docker基本使用" class="headerlink" title="docker基本使用"></a>docker基本使用</h1><h2 id="基本操作"><a href="#基本操作" class="headerlink" title="基本操作"></a>基本操作</h2><p>使用docker的时候必须使用root权限。所以在使用前，最好将使用docker的用户加入到<strong>docker</strong>这个用户组（docker用户组和root的权限一样）</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo usermod -aG docker <span class="variable">$&#123;USER&#125;</span></span><br><span class="line">sudo service docker restart</span><br></pre></td></tr></table></figure>
 
-<h3 id="搜索镜像"><a href="#搜索镜像" class="headerlink" title="搜索镜像"></a>搜索镜像</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker search 镜像名</span><br></pre></td></tr></table></figure>
+<h3 id="搜索镜像-docker-search"><a href="#搜索镜像-docker-search" class="headerlink" title="搜索镜像(docker search)"></a>搜索镜像(docker search)</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker search 镜像名</span><br></pre></td></tr></table></figure>
 
 <p>使用docker search 命令可以在dockers hub中搜索镜像，例如</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker search ubuntu</span><br></pre></td></tr></table></figure>
 
 <p>结果如下：</p>
 <p><a target="_blank" rel="noopener" href="https://imgchr.com/i/D1tW9I"><img src="https://s3.ax1x.com/2020/11/21/D1tW9I.png" alt="D1tW9I.png"></a></p>
-<h3 id="下载镜像"><a href="#下载镜像" class="headerlink" title="下载镜像"></a>下载镜像</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker pull 镜像名:标签</span><br></pre></td></tr></table></figure>
+<h3 id="下载镜像-docker-pull"><a href="#下载镜像-docker-pull" class="headerlink" title="下载镜像(docker pull)"></a>下载镜像(docker pull)</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker pull 镜像名:标签</span><br></pre></td></tr></table></figure>
 
 <p>docker pull可以从dockers hub中下载镜像。如果想要下载指定用户上传的镜像，则利用一下语法：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker pull 用户名/镜像名:标签</span><br></pre></td></tr></table></figure>
 
-<h3 id="列出镜像"><a href="#列出镜像" class="headerlink" title="列出镜像"></a>列出镜像</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker images</span><br></pre></td></tr></table></figure>
+<h3 id="列出镜像-docker-images"><a href="#列出镜像-docker-images" class="headerlink" title="列出镜像(docker images)"></a>列出镜像(docker images)</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker images</span><br></pre></td></tr></table></figure>
 
 <p>这个命令可以列出当前主机中的所有镜像。如果在后面指定了名称的话，则只列出名称相同但标签不同的镜像。</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker images ubuntu</span><br></pre></td></tr></table></figure>
 
 <p><a target="_blank" rel="noopener" href="https://imgchr.com/i/D1UKyV"><img src="https://s3.ax1x.com/2020/11/21/D1UKyV.png" alt="D1UKyV.png"></a></p>
-<h3 id="创建容器"><a href="#创建容器" class="headerlink" title="创建容器"></a>创建容器</h3><ol>
+<h3 id="创建容器-docker-run"><a href="#创建容器-docker-run" class="headerlink" title="创建容器(docker run)"></a>创建容器(docker run)</h3><ol>
 <li><p>创建容器后，运行shell</p>
  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -i -t --name hello centos /bin/bash</span><br></pre></td></tr></table></figure>
 
@@ -264,11 +264,15 @@
 <li><p>-v 表示将主机的/root/data目录连接到容器的/data目录</p>
 <p>下面我们在本机浏览器访问127.0.0.1查看结果(hello是我自己打包带一个镜像，具体看后文构建镜像部分)</p>
 <p><a target="_blank" rel="noopener" href="https://imgchr.com/i/D1a9h9"><img src="https://s3.ax1x.com/2020/11/21/D1a9h9.png" alt="D1a9h9.png"></a></p>
-<p>可以看到已经成功的启动了nginx服务.</p>
-<h3 id="查看当前运行的容器"><a href="#查看当前运行的容器" class="headerlink" title="查看当前运行的容器"></a>查看当前运行的容器</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker ps</span><br></pre></td></tr></table></figure>
+<p>可以看到已经成功的启动了nginx服务</p>
+<h3 id="查看当前运行的容器-docker-ps"><a href="#查看当前运行的容器-docker-ps" class="headerlink" title="查看当前运行的容器(docker ps)"></a>查看当前运行的容器(docker ps)</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker ps</span><br></pre></td></tr></table></figure>
 
-<p>没什么好说的，直接看结果</p>
+<p>这个命令会列出所有正在运行的容器</p>
 <p><a target="_blank" rel="noopener" href="https://imgchr.com/i/D1aV0O"><img src="https://s3.ax1x.com/2020/11/21/D1aV0O.png" alt="D1aV0O.png"></a></p>
+<p>如果输入</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker ps -a</span><br></pre></td></tr></table></figure>
+
+<p>那么会列出所有的容器，包括停止的</p>
 <h3 id="停止容器"><a href="#停止容器" class="headerlink" title="停止容器"></a>停止容器</h3><p>首先，利用ps命令查看当前运行的镜像</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker ps</span><br></pre></td></tr></table></figure>
 
@@ -287,20 +291,57 @@
 </ul>
 </li>
 </ol>
-<h3 id="连接到容器"><a href="#连接到容器" class="headerlink" title="连接到容器"></a>连接到容器</h3><p>首先，如果我们进入了一个容器的shell，那么我们可以使用exit来退出容器，这样的话容器也会终止。但是我们可以一次输入Ctrl+P , Ctrl+Q，这样的话就可以退出容器但容器还正常运行。</p>
+<h3 id="连接到容器-docker-attach"><a href="#连接到容器-docker-attach" class="headerlink" title="连接到容器(docker attach)"></a>连接到容器(docker attach)</h3><p>首先，如果我们进入了一个容器的shell，那么我们可以使用exit来退出容器，这样的话容器也会终止。但是我们可以一次输入Ctrl+P , Ctrl+Q，这样的话就可以退出容器但容器还正常运行。</p>
 <p>此时，如果我们想重新连接到容器的话，可以输入一下命令：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker attach 容器名</span><br></pre></td></tr></table></figure>
 
-<h3 id="外部执行容器内部命令"><a href="#外部执行容器内部命令" class="headerlink" title="外部执行容器内部命令"></a>外部执行容器内部命令</h3><p>如果容器正在运行的话，可以使用exec命令来从外部执行容器的命令，而无需连接到容器的shell</p>
+<h3 id="外部执行容器内部命令-docker-exec"><a href="#外部执行容器内部命令-docker-exec" class="headerlink" title="外部执行容器内部命令(docker exec)"></a>外部执行容器内部命令(docker exec)</h3><p>如果容器正在运行的话，可以使用exec命令来从外部执行容器的命令，而无需连接到容器的shell</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker <span class="built_in">exec</span> hello-nginx ls</span><br></pre></td></tr></table></figure>
 
 <p><a target="_blank" rel="noopener" href="https://imgchr.com/i/D1dIRs"><img src="https://s3.ax1x.com/2020/11/21/D1dIRs.png" alt="D1dIRs.png"></a></p>
-<h3 id="删除容器"><a href="#删除容器" class="headerlink" title="删除容器"></a>删除容器</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker rm 容器名</span><br></pre></td></tr></table></figure>
+<h3 id="删除容器-docker-rm"><a href="#删除容器-docker-rm" class="headerlink" title="删除容器(docker rm)"></a>删除容器(docker rm)</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker rm 容器名</span><br></pre></td></tr></table></figure>
 
-<h3 id="删除镜像"><a href="#删除镜像" class="headerlink" title="删除镜像"></a>删除镜像</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker rmi 镜像名:标签</span><br></pre></td></tr></table></figure>
+<h3 id="删除镜像-docker-rmi"><a href="#删除镜像-docker-rmi" class="headerlink" title="删除镜像(docker rmi)"></a>删除镜像(docker rmi)</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker rmi 镜像名:标签</span><br></pre></td></tr></table></figure>
 
+<h2 id="镜像操作"><a href="#镜像操作" class="headerlink" title="镜像操作"></a>镜像操作</h2><h3 id="查看镜像历史"><a href="#查看镜像历史" class="headerlink" title="查看镜像历史"></a>查看镜像历史</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker <span class="built_in">history</span> 镜像名:标签</span><br></pre></td></tr></table></figure>
 
+<p>使用history命令可以查看指定镜像的构建历史，对应的每一层镜像是怎么构建出来的。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker <span class="built_in">history</span> hello-nginx:0.1</span><br></pre></td></tr></table></figure>
 
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/D8FuNQ"><img src="https://s3.ax1x.com/2020/11/22/D8FuNQ.png" alt="D8FuNQ.png"></a></p>
+<h3 id="从容器内复制文件"><a href="#从容器内复制文件" class="headerlink" title="从容器内复制文件"></a>从容器内复制文件</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker cp 容器名:容器内路径 主机路径 </span><br></pre></td></tr></table></figure>
+
+<p>例如</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker cp hello:/etc/nginx/nginx.conf ./</span><br></pre></td></tr></table></figure>
+
+<p>执行上面的指令后，容器内的nginx.conf将被复制到主机内</p>
+<h3 id="从容器的修改中创建镜像"><a href="#从容器的修改中创建镜像" class="headerlink" title="从容器的修改中创建镜像"></a>从容器的修改中创建镜像</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker commit 选项 容器名 镜像名:标签</span><br></pre></td></tr></table></figure>
+
+<p>例如：</p>
+<p>首先，先创建一个容器,这里以centos镜像为例</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -it --name centos_test centos /bin/bash</span><br></pre></td></tr></table></figure>
+
+<p>然后再容器内创建一个文件</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@5e4e3a665f71 /]<span class="comment"># touch test.txt</span></span><br></pre></td></tr></table></figure>
+
+<p>然后输入exit退出容器，接着运行下面的命令来从容器的修改中创建镜像</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker commit -a <span class="string">&quot;zhangkai&quot;</span> -m <span class="string">&quot;test&quot;</span> centos_test centos</span><br></pre></td></tr></table></figure>
+
+<p>这样我们就更新了centos镜像了。</p>
+<h3 id="检查容器中文件的修改"><a href="#检查容器中文件的修改" class="headerlink" title="检查容器中文件的修改"></a>检查容器中文件的修改</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker diff 容器名</span><br></pre></td></tr></table></figure>
+
+<p>此命令可以对比容器和创建容器的镜像的文件差异。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker diff centos_test</span><br></pre></td></tr></table></figure>
+
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/D8EkcR"><img src="https://s3.ax1x.com/2020/11/22/D8EkcR.png" alt="D8EkcR.png"></a></p>
+<p>A为添加的文件，C为修改的文件，D为删除的文件</p>
+<h3 id="查看容器详细信息"><a href="#查看容器详细信息" class="headerlink" title="查看容器详细信息"></a>查看容器详细信息</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker inspect 容器名</span><br></pre></td></tr></table></figure>
+
+<p>此命令显示容器和镜像的详细信息</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker inspect centos_test</span><br></pre></td></tr></table></figure>
+
+<p>部分结果如下：</p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/D8Ea4g"><img src="https://s3.ax1x.com/2020/11/22/D8Ea4g.png" alt="D8Ea4g.png"></a></p>
 <h2 id="构建镜像"><a href="#构建镜像" class="headerlink" title="构建镜像"></a>构建镜像</h2><h3 id="基本流程"><a href="#基本流程" class="headerlink" title="基本流程"></a>基本流程</h3><p>通过编写Dockerfile的形式可以构建镜像。下面就以搭建一个nginx服务器为例演示一下。</p>
 <figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span> ubuntu:<span class="number">18.04</span></span><br><span class="line"><span class="keyword">MAINTAINER</span> Foo Bar &lt;foo@bar.com&gt;</span><br><span class="line"></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> apt update</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> apt install -y nginx</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> <span class="built_in">echo</span> <span class="string">&quot;\ndaemon off;&quot;</span> &gt;&gt; /etc/nginx/nginx.conf</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> chown -R www-data:www-data /var/lib/nginx</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">VOLUME</span><span class="bash"> [<span class="string">&quot;/data&quot;</span>, <span class="string">&quot;/etc/nginx/site-enabled&quot;</span>, <span class="string">&quot;/var/log/nginx&quot;</span>]</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">WORKDIR</span><span class="bash"> /etc/nginx</span></span><br><span class="line"><span class="keyword">CMD</span><span class="bash"> [<span class="string">&quot;nginx&quot;</span>]</span></span><br><span class="line"><span class="keyword">EXPOSE</span> <span class="number">80</span></span><br><span class="line"><span class="keyword">EXPOSE</span> <span class="number">443</span></span><br></pre></td></tr></table></figure>
 
@@ -413,7 +454,7 @@
 <p>WORKDIR指令也可以使用相对路径，最初相对的路径为/，之后每次相对的都是之前的路径</p>
 <figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">WORKDIR</span><span class="bash"> var <span class="comment"># 此时路径为/var</span></span></span><br><span class="line"><span class="keyword">WORKDIR</span><span class="bash"> www <span class="comment"># 此时路径为/var/www</span></span></span><br></pre></td></tr></table></figure>
 
-<h4 id="ONBUILD"><a href="#ONBUILD" class="headerlink" title="ONBUILD"></a>ONBUILD</h4><p>如果以当前镜像作为基础镜像时，ONBUILD就会在引用次镜像的Dockerfile的FROM指令后执行ONBUILD指令。</p>
+<h4 id="ONBUILD指令"><a href="#ONBUILD指令" class="headerlink" title="ONBUILD指令"></a>ONBUILD指令</h4><p>如果以当前镜像作为基础镜像时，ONBUILD就会在引用次镜像的Dockerfile的FROM指令后执行ONBUILD指令。</p>
 <figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ONBUILD</span> <span class="keyword">RUN</span><span class="bash"> touch hello.txt</span></span><br></pre></td></tr></table></figure>
 
 
