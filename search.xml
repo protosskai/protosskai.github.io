@@ -1,0 +1,983 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  <entry>
+    <title>Mybatis入门</title>
+    <url>/2020/11/10/Mybatis%E5%85%A5%E9%97%A8/</url>
+    <content><![CDATA[<h1 id="Mybatis入门"><a href="#Mybatis入门" class="headerlink" title="Mybatis入门"></a>Mybatis入门</h1><h3 id="引入mybatis"><a href="#引入mybatis" class="headerlink" title="引入mybatis"></a>引入mybatis</h3><ol>
+<li><p>首先，引入相关的依赖，具体如下</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="comment">&lt;!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>mysql<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>mysql-connector-java<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>5.1.47<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="comment">&lt;!-- https://mvnrepository.com/artifact/org.mybatis.spring.boot/mybatis-spring-boot-starter --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.mybatis.spring.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>mybatis-spring-boot-starter<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.1.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>然后，在配置文件里配置数据源和mybatis的相关设置</p>
+<figure class="highlight properties"><table><tr><td class="code"><pre><span class="line"><span class="comment">#datasource</span></span><br><span class="line"><span class="meta">spring.datasource.driver-class-name</span>=<span class="string">com.mysql.jdbc.Driver</span></span><br><span class="line"><span class="meta">spring.datasource.url</span>=<span class="string">jdbc:mysql://localhost:3306/community?characterEncoding=utf-8&amp;useSSL=false&amp;serverTimezone=Hongkong</span></span><br><span class="line"><span class="meta">spring.datasource.username</span>=<span class="string">root</span></span><br><span class="line"><span class="comment">#注意修改密码</span></span><br><span class="line"><span class="meta">spring.datasource.password</span>=<span class="string">123456</span></span><br><span class="line"><span class="meta">spring.datasource.type</span>=<span class="string">com.zaxxer.hikari.HikariDataSource</span></span><br><span class="line"><span class="meta">spring.datasource.hikari.maximum-pool-size</span>=<span class="string">15</span></span><br><span class="line"><span class="meta">spring.datasource.hikari.minimum-idle</span>=<span class="string">5</span></span><br><span class="line"><span class="meta">spring.datasource.hikari.idle-timeout</span>=<span class="string">30000</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#mybatis</span></span><br><span class="line"><span class="meta">mybatis.mapper-locations</span>=<span class="string">classpath:mapper/*.xml</span></span><br><span class="line"><span class="comment">#在配置type-aliases-package后，以后写mapper.xml文件的时候，返回值类型和参数类型就不用写类的全限定#名了，直接写类名就行</span></span><br><span class="line"><span class="meta">mybatis.type-aliases-package</span>=<span class="string">com.kai.entity</span></span><br><span class="line"><span class="meta">mybatis.configuration.use-generated-keys</span>=<span class="string">true</span></span><br><span class="line"><span class="comment">#当开启这个选项时，以驼峰式命名法命名的实体类就会被自动映射到数据库表里面以下划线分隔的字段</span></span><br><span class="line"><span class="meta">mybatis.configuration.map-underscore-to-camel-case</span>=<span class="string">true</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><ul>
+<li><p>首先，在数据库里面新建一张表</p>
+</li>
+<li><p>然后在entity包里面建立一个对应这个表各个字段的bean。</p>
+</li>
+<li><p>然后在dao包里面建立一个<strong>接口</strong>，用于对应对这个bean的各个操作的方法</p>
+</li>
+<li><p>在springboot启动类上添加一个注解，**@MapperScan(“com.kai.dao”)**，用于扫描mapper</p>
+</li>
+<li><p>然后在<strong>resource文件夹</strong>下面建立一个mapper文件夹，在mapper文件夹下面建立一个*.xml，这个xml就是这个bean的mapper文件，书写规则如下：</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;</span></span><br><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">mapper</span></span></span><br><span class="line"><span class="meta">        <span class="meta-keyword">PUBLIC</span> <span class="meta-string">&quot;-//mybatis.org//DTD Mapper 3.0//EN&quot;</span></span></span><br><span class="line"><span class="meta">        <span class="meta-string">&quot;http://mybatis.org/dtd/mybatis-3-mapper.dtd&quot;</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!-- namespace必须是这个mapper对应的接口的全限定名 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">mapper</span> <span class="attr">namespace</span>=<span class="string">&quot;com.kai.dao.UserMapper&quot;</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- 定义一个sql语句，在引用的时候直接将这个语句内的内容插入，减少代码冗余 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">sql</span> <span class="attr">id</span>=<span class="string">&quot;selectField&quot;</span>&gt;</span></span><br><span class="line">        id,username,password,salt,email,type,status,activation_code,header_url,create_time</span><br><span class="line">    <span class="tag">&lt;/<span class="name">sql</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">sql</span> <span class="attr">id</span>=<span class="string">&quot;insertField&quot;</span>&gt;</span></span><br><span class="line">        username,password,salt,email,type,status,activation_code,header_url,create_time</span><br><span class="line">    <span class="tag">&lt;/<span class="name">sql</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!-- 因为开启了驼峰命名转换，所以type可以直接写类名，否则就得写类的全限定名--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">&quot;selectById&quot;</span> <span class="attr">resultType</span>=<span class="string">&quot;User&quot;</span> <span class="attr">parameterType</span>=<span class="string">&quot;int&quot;</span>&gt;</span></span><br><span class="line">        select <span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">&quot;selectField&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">include</span>&gt;</span></span><br><span class="line">        from user</span><br><span class="line">        where id = #&#123;id&#125;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">&quot;selectByName&quot;</span> <span class="attr">resultType</span>=<span class="string">&quot;User&quot;</span> <span class="attr">parameterType</span>=<span class="string">&quot;int&quot;</span>&gt;</span></span><br><span class="line">        select <span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">&quot;selectField&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">include</span>&gt;</span></span><br><span class="line">        from user</span><br><span class="line">        where username = #&#123;username&#125;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">&quot;selectByEmail&quot;</span> <span class="attr">resultType</span>=<span class="string">&quot;User&quot;</span> <span class="attr">parameterType</span>=<span class="string">&quot;int&quot;</span>&gt;</span></span><br><span class="line">        select <span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">&quot;selectField&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">include</span>&gt;</span></span><br><span class="line">        from user</span><br><span class="line">        where email = #&#123;email&#125;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!-- keyProperty是实体类对应的数据表的主键名称，用于主键回填（自增） --&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- 注意，value里面填写的时实体类的属性，是驼峰式命名--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">insert</span> <span class="attr">id</span>=<span class="string">&quot;insertUser&quot;</span> <span class="attr">parameterType</span>=<span class="string">&quot;User&quot;</span> <span class="attr">keyProperty</span>=<span class="string">&quot;id&quot;</span>&gt;</span></span><br><span class="line">        insert into user (<span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">&quot;insertField&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">include</span>&gt;</span>)</span><br><span class="line">        value (#&#123;username&#125;,#&#123;password&#125;,#&#123;salt&#125;,#&#123;email&#125;,#&#123;type&#125;,#&#123;status&#125;,#&#123;activationCode&#125;,#&#123;headerUrl&#125;,#&#123;createTime&#125;)</span><br><span class="line">    <span class="tag">&lt;/<span class="name">insert</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">update</span> <span class="attr">id</span>=<span class="string">&quot;updateStatus&quot;</span>&gt;</span></span><br><span class="line">        update user set status = #&#123;status&#125; where id = #&#123;id&#125;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">update</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">update</span> <span class="attr">id</span>=<span class="string">&quot;updateHeader&quot;</span>&gt;</span></span><br><span class="line">        update user set header_url = #&#123;headerUrl&#125; where id = #&#123;id&#125;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">update</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">update</span> <span class="attr">id</span>=<span class="string">&quot;updatePassword&quot;</span>&gt;</span></span><br><span class="line">        update user set password = #&#123;password&#125; where id = #&#123;id&#125;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">update</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">mapper</span>&gt;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>之后在需要使用的时候注入mapper接口，然后使用方法就行了，例子如下：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Autowired</span></span><br><span class="line">   <span class="keyword">private</span> UserMapper mapper;</span><br><span class="line">   <span class="meta">@RequestMapping(&quot;/test&quot;)</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> String <span class="title">testMybatis</span><span class="params">(Model model)</span></span>&#123;</span><br><span class="line">       User user = mapper.selectById(<span class="number">101</span>);</span><br><span class="line">       model.addAttribute(<span class="string">&quot;name&quot;</span>,user.getUsername());</span><br><span class="line">       System.out.println(user);</span><br><span class="line">       <span class="keyword">return</span> <span class="string">&quot;/demo/view&quot;</span>;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+</li>
+</ol>
+]]></content>
+      <categories>
+        <category>mybatis</category>
+      </categories>
+      <tags>
+        <tag>javaweb</tag>
+        <tag>mybatis</tag>
+        <tag>配置</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>QEMU模拟嵌入式ARM LINUX开发环境配置</title>
+    <url>/2020/11/15/QEMU%E6%A8%A1%E6%8B%9F%E5%B5%8C%E5%85%A5%E5%BC%8FARM-LINUX%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE/</url>
+    <content><![CDATA[<h1 id="QEMU模拟嵌入式ARM-LINUX开发环境配置"><a href="#QEMU模拟嵌入式ARM-LINUX开发环境配置" class="headerlink" title="QEMU模拟嵌入式ARM LINUX开发环境配置"></a>QEMU模拟嵌入式ARM LINUX开发环境配置</h1><p>参考：<a href="https://blog.csdn.net/zhvngchvng/article/details/107856401#2Linux_35">https://blog.csdn.net/zhvngchvng/article/details/107856401#2Linux_35</a></p>
+<p>开发环境：UBUNTU 20.04 64位</p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>首先，我们需要了解一些基本概念：<br><strong>arm交叉编译器</strong>：在主机上编译能够在arm开发板上运行的代码。<br><strong>linux内核</strong>：linux运行的核心代码。<br><strong>linux内核模块</strong>：动态可加载内核模块，执行时依赖于内核，可以看做是内核的一个拓展，包含各种驱动程序（驱动开发就主要是这一块）。<br><strong>linux设备树</strong>：与硬件相关，用来描述芯片平台及板级差异的。<br><strong>根文件系统</strong>：内核启动时挂载的第一个文件系统，用来访问各种目录和文件，与内核互相独立。<br><strong>bootloader</strong>：开发板启动时的引导程序，一般使用u-boot来制作。<br>所以，为了在arm开发板上成功运行Linux系统，我们有如下三个方面的任务：</p>
+<ol>
+<li>制作bootloader；</li>
+<li>编译linux内核、linux内核模块、linux设备树；</li>
+<li>制作根文件系统。<br> 下面，我们使用qemu虚拟机来上手嵌入式linux的开发。</li>
+</ol>
+<h2 id="qemu和相关工具链的安装"><a href="#qemu和相关工具链的安装" class="headerlink" title="qemu和相关工具链的安装"></a>qemu和相关工具链的安装</h2><p>安装qemu有以下命令来完成：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo apt install qemu-system</span><br></pre></td></tr></table></figure>
+
+<p>在命令行输入以下内容安装ARM交叉编译工具：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo apt-get install qemu</span><br></pre></td></tr></table></figure>
+
+<p>若需要安装较新版本的qemu，可以自行下载源码手动编译安装）<br>使用<code>qemu-system-</code>命令可以查看qemu支持的CPU架构。<br>使用<code>qemu-system-arm --version</code>命令可以查看qemu的版本。<br>使用<code>qemu-system-arm -M help</code>命令可以查看支持的开发板类别。</p>
+<h2 id="Linux内核与设备树编译"><a href="#Linux内核与设备树编译" class="headerlink" title="Linux内核与设备树编译"></a>Linux内核与设备树编译</h2><p>下载Linux内核：<a href="https://www.kernel.org/">https://www.kernel.org/</a><br>选择长期维护的版本进行下载，这里选择5.3.6</p>
+<p>将下载下来的Linux内核拷贝到home目录，使用<code>tar xvf linux-5.3.6.tar.xz</code>进行解压缩。<br>解压好后输入<code>cd linux-5.3.6/</code>进入linux内核目录下</p>
+<p>修改Makefile：<code>vim Makefile</code><br>搜索交叉编译关键字，在vim编辑器中输入：<code>/CROSS_COMPILE</code>，然后回车<br>向下移动光标，找到关键字<strong>ARCH</strong>和<strong>CROSS_COMPILE</strong>，按i键进入插入文本模式，将其修改为如下内容：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">ARCH	?= arm</span><br><span class="line"><span class="comment"># 注意不要忘记最后的小横线！</span></span><br><span class="line">CROSS_COMPILE	?= arm-linux-gnueabi-  </span><br></pre></td></tr></table></figure>
+
+<p>按Esc键切换为一般模式，输入<code>:wq</code>保存并退出。</p>
+<p>这里我们选择<strong>vexpress</strong>系列作为我们虚拟开发板，在linux内核目录下，输入<code>make vexpress_defconfig</code>对开发板进行配置，编译后生成.config文件.在make的过程中，可能会提示缺少flex和bison而失败，这时用apt安装即可。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo apt install flex</span><br><span class="line">sudo apt install bison</span><br></pre></td></tr></table></figure>
+
+<p>配置好后，编译<strong>内核</strong>，生成zImage镜像文件：<code>make zImage -j6</code>（多线程编译）<br>编译<strong>内核模块</strong>：<code>make modules -j4</code><br>编译<strong>设备树</strong>，获得dtb文件：<code>make dtbs</code><br>在linux内核目录下，使用qemu运行内核：<code>qemu-system-arm -M vexpress-a9 -m 512M -kernel arch/arm/boot/zImage -dtb arch/arm/boot/dts/vexpress-v2p-ca9.dtb -nographic -append &quot;console=ttyAMA0&quot;</code>，该命令指定了开发板类别、内存大小、内核zImage文件、dtb文件、无图形界面、串口。</p>
+<p>可以看到内核开始运行起来：</p>
+<p><a href="https://imgchr.com/i/DFGnit"><img src="https://s3.ax1x.com/2020/11/15/DFGnit.md.png" alt="DFGnit.md.png"></a></p>
+<p>但是卡在了挂载根文件系统处，别急，接着往下看。</p>
+<h2 id="busybox根文件系统制作"><a href="#busybox根文件系统制作" class="headerlink" title="busybox根文件系统制作"></a>busybox根文件系统制作</h2><p>首先，关掉之前的qemu进程</p>
+<p>使用ps命令查看qemu进程：<code>ps -a</code></p>
+<p><a href="https://imgchr.com/i/DFGMz8"><img src="https://s3.ax1x.com/2020/11/15/DFGMz8.png" alt="DFGMz8.png"></a></p>
+<p>要是没看到qemu进程，就不用kill，否则，kill掉qemu进程。kill 25906</p>
+<p>接下来，使用busybox制作根文件系统。<br>下载源码：<a href="https://busybox.net/downloads/%EF%BC%8C%E4%B8%8B%E8%BD%BD%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC%E5%8D%B3%E5%8F%AF%E3%80%82">https://busybox.net/downloads/，下载最新版本即可。</a></p>
+<p><a href="https://imgchr.com/i/DFGNiq"><img src="https://s3.ax1x.com/2020/11/15/DFGNiq.png" alt="DFGNiq.png"></a></p>
+<p>解压缩：<code>tar xvf busybox-1.32.0.tar.bz2</code><br>进入busybox源码目录：<code>cd busybox-1.32.0/</code><br>修改Makefile：<code>vim Makefile</code><br>在vim编辑器中输入<code>/CROSS_COMPILE</code>查找关键字<strong>CROSS_COMPILE</strong>。<br>向下移动光标，找到关键字所在处，按i键切换到插入模式，并将值修改为<code>arm-linux-gnueabi-</code>：</p>
+<p><a href="https://imgchr.com/i/DFGaWV"><img src="https://s3.ax1x.com/2020/11/15/DFGaWV.png" alt="DFGaWV.png"></a></p>
+<p>按Esc退出插入模式，输入<code>/ARCH</code>查找关键字<strong>ARCH</strong>。<br>向下移动光标，找到关键字，按i切换到插入模式，并将值修改为<code>arm</code>：</p>
+<p><a href="https://imgchr.com/i/DFGdzT"><img src="https://s3.ax1x.com/2020/11/15/DFGdzT.png" alt="DFGdzT.png"></a></p>
+<p>按Esc键，输入<code>:wq</code>保存退出。<br>接着，输入命令<code>make defconfig</code>回车等待配置完毕。<br>也可以使用图形化配置<code>make menuconfig</code>，按回车然后进入Settings选项，找到Build Options，点y键将选项Build static binary（编译成静态）选中，然后退出：</p>
+<p><a href="https://imgchr.com/i/DFGseJ"><img src="https://s3.ax1x.com/2020/11/15/DFGseJ.png" alt="DFGseJ.png"></a></p>
+<p>当输入make menuconfig的时候，会提示找不到curses.h，这时候就要安装libncurses5-dev</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo apt-get install libncurses5-dev</span><br></pre></td></tr></table></figure>
+
+<p>要是依赖有问题而安装失败的话，可以尝试安装aptitude</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo apt install aptitude</span><br></pre></td></tr></table></figure>
+
+<p>然后用aptitude安装这个库</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo aptitude install libncurses5-dev</span><br></pre></td></tr></table></figure>
+
+<p>aptitude会检测冲突后的解决方案，选择一个合适的即可。（若不合适的话，可以选择输入n来查看下一个方案）</p>
+<p>回到命令行，直接编译：<code>make -j4</code><br>然后执行<code>make install</code>，生成一个<strong>_install</strong>文件夹。<br>准备好后，下一步开始制作根文件系统。<br>输入<code>cd</code>回到home目录，新建目录<code>mkdir rootfs</code>，进入该目录<code>cd rootfs/</code>，将刚才生成的<strong>_install</strong>目录里的所有文件拷贝到该目录下：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">cp -r 你编译busybox的目录/_install/* ./</span><br></pre></td></tr></table></figure>
+
+<p>新建目录<code>mkdir lib</code>，将arm交叉编译器的库复制过来：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">cp -r /usr/arm-linux-gnueabi/lib/* lib/</span><br></pre></td></tr></table></figure>
+
+<p>在rootfs目录下新建目录<code>mkdir dev/</code>，进入该目录<code>cd dev/</code>，创建节点<code>sudo mknod -m 666 tty1 c 4 1</code>（这里创建了一个串口字符设备，<strong>主设备号</strong>为4，<strong>从设备号</strong>为1）。<br>重复创建多个串口设备，注意分配好从设备号：(重复分配tty2-9，主设备仍未，从设备号为2-9)<br>创建一个控制台节点：<code>mknod -m 666 console c 5 1</code><br>创建一个空节点：<code>mknod -m 666 null c 1 3</code><br>创建好的字符设备用<code>ls</code>查看：</p>
+<p><a href="https://imgchr.com/i/DFJ9Ts"><img src="https://s3.ax1x.com/2020/11/15/DFJ9Ts.png" alt="DFJ9Ts.png"></a></p>
+<p>回到home目录，输入命令<code>dd if=/dev/zero of=rootfs.ext3 bs=1M count=32</code>生成虚拟SD卡系统镜像，可以得到一个rootfs.ext3文件。<br>格式化该镜像：<code>mkfs.ext3 rootfs.ext3</code><br>挂载该镜像到本地：<code>mount -t ext3 rootfs.ext3 /mnt -o loop</code><br>将之前准备的rootfs目录下的所有文件都拷贝到该镜像挂载点：<code>cp -r /home/zvcv/rootfs/* /mnt/</code><br>卸载：umount /mnt/<br>进入linux源码目录： <code>cd linux/</code><br>使用qemu启动内核：<code>qemu-system-arm -M vexpress-a9 -m 512M -kernel arch/arm/boot/zImage -dtb arch/arm/boot/dts/vexpress-v2p-ca9.dtb -nographic -append &quot;root=/dev/mmcblk0 rw console=ttyAMA0&quot; -sd /home/zvcv/rootfs.ext3</code>，这里比之前多指定了一个sd镜像。<br>点击回车，进入命令行，linux启动完毕。</p>
+<p><a href="https://imgchr.com/i/DFJV6U"><img src="https://s3.ax1x.com/2020/11/15/DFJV6U.png" alt="DFJV6U.png"></a></p>
+<p>若要图形化启动，使用命令：<code>qemu-system-arm -M vexpress-a9 -m 512M -kernel arch/arm/boot/zImage -dtb arch/arm/boot/dts/vexpress-v2p-ca9.dtb -append &quot;root=/dev/mmcblk0 rw console=tty0&quot; -sd rootfs.ext3</code></p>
+<p><a href="https://imgchr.com/i/DFJqHJ"><img src="https://s3.ax1x.com/2020/11/15/DFJqHJ.png" alt="DFJqHJ.png"></a></p>
+<h2 id="使用u-boot加载Linux内核"><a href="#使用u-boot加载Linux内核" class="headerlink" title="使用u-boot加载Linux内核"></a>使用u-boot加载Linux内核</h2><p>下载源码：<a href="https://ftp.denx.de/pub/u-boot/">u-boot下载</a>，选择合适的版本即可。<br>（较新版本的u-boot需要更高版本的gcc来编译，为了方便起见，可以选用较早版本的u-boot）</p>
+<p><a href="https://ftp.denx.de/pub/u-boot/u-boot-2017.05.tar.bz2">https://ftp.denx.de/pub/u-boot/u-boot-2017.05.tar.bz2</a></p>
+<p><a href="https://imgchr.com/i/DFYdrF"><img src="https://s3.ax1x.com/2020/11/15/DFYdrF.png" alt="DFYdrF.png"></a></p>
+<p>下载后解压缩：<code>tar xvf u-boot-2020.07.tar.bz2</code><br>切换到目录：<code>cd u-boot-2020.07</code><br>编辑Makefile文件：<code>vim Makefile</code><br>查找关键字：<code>/CROSS_COMPILE</code><br>向下翻，找到<strong>CROSS_COMPILE</strong>，按i键切换模式，修改为如下内容：</p>
+<p><a href="https://imgchr.com/i/DFY4VH"><img src="https://s3.ax1x.com/2020/11/15/DFY4VH.png" alt="DFY4VH.png"></a></p>
+<p>按Esc键退出插入模式，输入<code>:wq</code>保存并退出。<br>命令行输入<code>vim config.mk</code><br>查找关键字：<code>/ARCH</code><br>按i键切换模式，修改关键字的值：</p>
+<p><a href="https://imgchr.com/i/DFY7Gt"><img src="https://s3.ax1x.com/2020/11/15/DFY7Gt.png" alt="DFY7Gt.png"></a></p>
+<p>按Esc键退出插入模式，输入<code>:wq</code>保存并退出。<br>命令行输入命令进行配置：<code>make vexpress_ca9x4_defconfig</code><br>配置好后，编译：<code>make</code></p>
+<p>如果报以下的错的话</p>
+<p><a href="https://imgchr.com/i/DFtseg"><img src="https://s3.ax1x.com/2020/11/15/DFtseg.png" alt="DFtseg.png"></a></p>
+<p>可以尝试</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">export</span> CROSS_COMPILE=arm-linux-gnueabi-</span><br><span class="line"><span class="built_in">export</span> ARCH=arm</span><br></pre></td></tr></table></figure>
+
+<p>然后</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">make vexpress_ca9x4_defconfig</span><br><span class="line">make</span><br></pre></td></tr></table></figure>
+
+<p>若make时又出现如下错误：</p>
+<p><a href="https://imgchr.com/i/DFtomF"><img src="https://s3.ax1x.com/2020/11/15/DFtomF.png" alt="DFtomF.png"></a></p>
+<p>则需要安装device-tree-compiler：<code>sudo apt-get install device-tree-compiler</code></p>
+<p>make完成后，启动u-boot：<code>qemu-system-arm -M vexpress-a9 -m 512M -nographic -kernel u-boot</code>（注意：按下enter键后，会出现一个2s倒计时，询问你是否停止自动启动，直接回车就可以跳过启动过程中各种外设的加载）<br>输入命令测试：<code>help</code>，可以查看支持的命令。<br>运行成功后，删除该qemu进程：<code>ps -a</code>查找PID号，<code>kill</code>命令删除</p>
+<h2 id="搭建网络开发环境"><a href="#搭建网络开发环境" class="headerlink" title="搭建网络开发环境"></a>搭建网络开发环境</h2><p>首先需要配置虚拟网卡，用于分配给qemu。</p>
+]]></content>
+      <categories>
+        <category>嵌入式</category>
+      </categories>
+      <tags>
+        <tag>qemu</tag>
+        <tag>linux</tag>
+        <tag>arm</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>SpaceVim安装和配置</title>
+    <url>/2020/11/12/SpaceVim%E5%AE%89%E8%A3%85%E5%92%8C%E9%85%8D%E7%BD%AE/</url>
+    <content><![CDATA[<h1 id="SpaceVim的安装和配置"><a href="#SpaceVim的安装和配置" class="headerlink" title="SpaceVim的安装和配置"></a>SpaceVim的安装和配置</h1><h2 id="为什么选择Vim"><a href="#为什么选择Vim" class="headerlink" title="为什么选择Vim"></a>为什么选择Vim</h2><p>因为经常有在linux下面编写代码的需求。这里之所以选择vim而不是专用的IDE是因为时常会以ssh的形式连接到服务器去编写代码，所以图形界面并不都是支持的，所以抽空学习了一下vim。简单的熟悉了一下vim的基本使用方法之后，发现vim配置起来十分的繁琐，而我又不想牵扯太多的精力在vim的配置上面，所以就使用了这个比较方便的Spacevim项目，这个项目里面配置了许多常用的设置，并且安装了一些插件，可以做到开箱即用，因此选择了他，另外，华丽的界面和便捷的操作也是很重要的加分项。下面就是安装完毕后的样子。</p>
+<p><a href="https://imgchr.com/i/Bxb26g"><img src="https://s3.ax1x.com/2020/11/12/Bxb26g.md.png" alt="Bxb26g.md.png"></a></p>
+<h2 id="SpaceVim的安装"><a href="#SpaceVim的安装" class="headerlink" title="SpaceVim的安装"></a>SpaceVim的安装</h2><p>Spacevim的官网：<a href="https://spacevim.org/cn/">https://spacevim.org/cn/</a></p>
+<p>安装步骤：</p>
+<p>Spacevim的安装步骤很简单，按照官网的指引去做就可以了。</p>
+<p>首先，在Linux平台下面，下载官方的安装脚本并运行：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">curl -sLf https://spacevim.org/cn/install.sh | bash</span><br></pre></td></tr></table></figure>
+
+<p>输入以上命令之后，就会自动安装Spacevim这个项目。安装完毕之后，第一次打开vim的时候就回去自动安装各种插件，并配置好环境。</p>
+<p>如果想要卸载的话，运行一下的命令：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">curl -sLf https://spacevim.org/cn/install.sh | bash -s -- -h</span><br></pre></td></tr></table></figure>
+
+<p>上述命令会显示各种操作，找到卸载的操作并且输入命令即可。</p>
+<h2 id="字体的安装"><a href="#字体的安装" class="headerlink" title="字体的安装"></a>字体的安装</h2><p>SpaceVim会使用图标字体，因此如果当前系统下没有图标字体的话，那么打开vim的时候就会出现一部分文字的乱码，解决方法就是安装对应的图标字体，安装方法如下：</p>
+<p>这里以nerd-font为例，演示Linux下字体的安装</p>
+<p>nerd-font的git仓库链接：<a href="https://github.com/ryanoasis/nerd-fonts/releases/tag/v2.1.0">https://github.com/ryanoasis/nerd-fonts/releases/tag/v2.1.0</a></p>
+<p>进入上述链接，找到你想要使用的一款字体，这里以<strong>DejaVuSansMono</strong>字体为例。</p>
+<p><a href="https://imgchr.com/i/Bxbg1S"><img src="https://s3.ax1x.com/2020/11/12/Bxbg1S.png" alt="Bxbg1S.png"></a></p>
+<p>下载完毕后，进入下载文件夹执行以下命令</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo unzip DejaVuSansMono.zip -d /usr/share/fonts/DejaVuSansMono</span><br></pre></td></tr></table></figure>
+
+<p>然后</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">cd</span> /usr/share/fonts/DejaVuSansMono</span><br><span class="line">sudo mkfontscale <span class="comment"># 生成核心字体信息</span></span><br><span class="line">sudo mkfontdir <span class="comment"># 生成字体文件夹</span></span><br><span class="line">sudo fc-cache -fv <span class="comment"># 刷新系统字体缓存</span></span><br></pre></td></tr></table></figure>
+
+<p>按照以上步骤操作后，图标字体就被安装到系统中了，下一步就是要给终端设置刚刚安装好的字体。具体方法根据你是用的终端来设置。</p>
+<h2 id="常用的操作"><a href="#常用的操作" class="headerlink" title="常用的操作"></a>常用的操作</h2><h3 id="快捷键"><a href="#快捷键" class="headerlink" title="快捷键"></a>快捷键</h3><p>Spacevim的leader键为反斜杠\，SPC键为空格。在普通模式下，按下空格后，等待一个间隔，就会出现提示菜单来提示后续的快捷键，当我们忘记某个快捷键时可以利用此方式来查看。</p>
+<p><a href="https://imgchr.com/i/BxqK9f"><img src="https://s3.ax1x.com/2020/11/12/BxqK9f.png" alt="BxqK9f.png"></a></p>
+<h3 id="常用快捷键"><a href="#常用快捷键" class="headerlink" title="常用快捷键"></a>常用快捷键</h3><p>使用文档：<a href="https://spacevim.org/cn/documentation/">https://spacevim.org/cn/documentation/</a></p>
+<h4 id="窗口管理"><a href="#窗口管理" class="headerlink" title="窗口管理"></a>窗口管理</h4><p>常用的窗口管理快捷键有一个统一的前缀，默认的前缀 <code>[Window]</code> 是按键 <code>s</code>，可以在配置文件中通过修改 SpaceVim 选项 <code>window_leader</code> 的值来设为其它按键：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[options]</span><br><span class="line">    windows_leader &#x3D; &quot;s&quot;</span><br></pre></td></tr></table></figure>
+
+<p>Ctrl加方向键可以切换窗口</p>
+<p>q  关闭当前窗口</p>
+<p><code>[Window]</code> v 水平分屏</p>
+<p><code>[Window]</code> g 垂直分屏</p>
+<p><code>[Window]</code> t  新建标签页 </p>
+<p>F3 打开文件管理器</p>
+<h4 id="滚动操作"><a href="#滚动操作" class="headerlink" title="滚动操作"></a>滚动操作</h4><p>Ctrl e  向下滚动</p>
+<p>Ctrl y 向上滚动</p>
+<p>Ctrl f 向下翻页</p>
+<p>Ctrl b 向上翻页</p>
+<h4 id="复制粘贴"><a href="#复制粘贴" class="headerlink" title="复制粘贴"></a>复制粘贴</h4><p><leader> 为反斜杠\</p>
+<p><leader> y 复制文本至系统剪切板</p>
+<p><Leader> p 粘贴系统剪切板文字至当前位置之后</p>
+<p><Leader> P 粘贴系统剪切板文字至当前位置之前</p>
+]]></content>
+      <categories>
+        <category>vim</category>
+      </categories>
+      <tags>
+        <tag>SpaceVim</tag>
+        <tag>vim</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Springboot中使用thymeleaf</title>
+    <url>/2020/11/10/Springboot%E4%B8%AD%E4%BD%BF%E7%94%A8thymeleaf/</url>
+    <content><![CDATA[<h1 id="Springboot中使用thymeleaf"><a href="#Springboot中使用thymeleaf" class="headerlink" title="Springboot中使用thymeleaf"></a>Springboot中使用thymeleaf</h1><h3 id="使用前的准备"><a href="#使用前的准备" class="headerlink" title="使用前的准备"></a>使用前的准备</h3><p>springboot项目的目录结构如下图所示：</p>
+<p><img src="https://s2.ax1x.com/2019/10/05/usYFTx.png" alt="usYFTx.png"></p>
+<p>其中，resources文件夹是存放资源文件的目录。其中，static文件夹是静态文件目录，用于存放css，js，img等静态资源文件。templates文件夹用于存放模板文件，也就是我们thymeleaf模板引擎所需要使用的html文件。我们将静态文件放在static文件夹内，把html文件放在templates文件夹内就做好了前期准备。</p>
+<h3 id="thymeleaf的使用流程"><a href="#thymeleaf的使用流程" class="headerlink" title="thymeleaf的使用流程"></a>thymeleaf的使用流程</h3><h4 id="声明模板引擎"><a href="#声明模板引擎" class="headerlink" title="声明模板引擎"></a>声明模板引擎</h4><p>首先，新建的html文件中，需要声明一下使用thymeleaf模板引擎，方法如下：</p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;!doctype <span class="meta-keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">&quot;en&quot;</span> <span class="attr">xmlns:th</span>=<span class="string">&quot;http://www.thymeleaf.org&quot;</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>在html标签后面填下这句即可。</p>
+<h4 id="引入静态文件。"><a href="#引入静态文件。" class="headerlink" title="引入静态文件。"></a>引入静态文件。</h4><p>thymeleaf内置引入文件的语法，来帮助我们引入静态文件，方法如下：</p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">link</span> <span class="attr">rel</span>=<span class="string">&quot;stylesheet&quot;</span> <span class="attr">th:href</span>=<span class="string">&quot;@&#123;/css/global.css&#125;&quot;</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">th:src</span>=<span class="string">&quot;@&#123;/js/global.js&#125;&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>在link标签中使用<strong>th:href</strong>。或者在src标签中使用<strong>th:src</strong>来取代原来的href和src。这样的话，thymeleaf就会自动去**/static**文件夹里面去找。</p>
+<h4 id="thymeleaf的模板语法"><a href="#thymeleaf的模板语法" class="headerlink" title="thymeleaf的模板语法"></a>thymeleaf的模板语法</h4><p>首先，我们先来看一段代码，来演示模板语法。在这段代码执行前，我已经通过controller传入了数据，如下：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@RequestMapping(path = &quot;/index&quot;, method = RequestMethod.GET)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getIndexPage</span><span class="params">(Model model, Page page)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 方法调用钱,SpringMVC会自动实例化Model和Page,并将Page注入Model.</span></span><br><span class="line">        <span class="comment">// 所以,在thymeleaf中可以直接访问Page对象中的数据.</span></span><br><span class="line">        page.setRows(discussPostService.findDiscussPostRows(<span class="number">0</span>));</span><br><span class="line">        page.setPath(<span class="string">&quot;/index&quot;</span>);</span><br><span class="line"></span><br><span class="line">        List&lt;DiscussPost&gt; list = discussPostService.findDiscussPosts(<span class="number">0</span>, page.getOffset(), page.getLimit());</span><br><span class="line">        List&lt;Map&lt;String, Object&gt;&gt; discussPosts = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        <span class="keyword">if</span> (list != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">for</span> (DiscussPost post : list) &#123;</span><br><span class="line">                Map&lt;String, Object&gt; map = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">                map.put(<span class="string">&quot;post&quot;</span>, post);</span><br><span class="line">                User user = userService.findUserById(post.getUserId());</span><br><span class="line">                map.put(<span class="string">&quot;user&quot;</span>, user);</span><br><span class="line">                discussPosts.add(map);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        model.addAttribute(<span class="string">&quot;discussPosts&quot;</span>, discussPosts);</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;/index&quot;</span>;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>这是一段Java代码，我向index模板添加了一个list，list中的每个元素都是一个map。</p>
+<p><code> model.addAttribute(&quot;discussPosts&quot;, discussPosts);</code></p>
+<p>map中存放的是一个<strong>一篇文章</strong>和<strong>这个文章的user</strong>。在了解了传递给模板的数据后，我们来看一下模板的内容。</p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">li</span> <span class="attr">class</span>=<span class="string">&quot;media pb-3 pt-3 mb-3 border-bottom&quot;</span> <span class="attr">th:each</span>=<span class="string">&quot;map:$&#123;discussPosts&#125;&quot;</span>&gt;</span></span><br><span class="line">						<span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">&quot;site/profile.html&quot;</span>&gt;</span></span><br><span class="line">							<span class="tag">&lt;<span class="name">img</span> <span class="attr">th:src</span>=<span class="string">&quot;$&#123;map.user.headerUrl&#125;&quot;</span> <span class="attr">class</span>=<span class="string">&quot;mr-4 rounded-circle&quot;</span> <span class="attr">alt</span>=<span class="string">&quot;用户头像&quot;</span> <span class="attr">style</span>=<span class="string">&quot;width:50px;height:50px;&quot;</span>&gt;</span></span><br><span class="line">						<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line">						<span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;media-body&quot;</span>&gt;</span></span><br><span class="line">							<span class="tag">&lt;<span class="name">h6</span> <span class="attr">class</span>=<span class="string">&quot;mt-0 mb-3&quot;</span>&gt;</span></span><br><span class="line">								<span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">&quot;#&quot;</span> <span class="attr">th:utext</span>=<span class="string">&quot;$&#123;map.post.title&#125;&quot;</span>&gt;</span>备战春招，面试刷题跟他复习，一个月全搞定！<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line">								<span class="tag">&lt;<span class="name">span</span> <span class="attr">class</span>=<span class="string">&quot;badge badge-secondary bg-primary&quot;</span> <span class="attr">th:if</span>=<span class="string">&quot;$&#123;map.post.type==1&#125;&quot;</span>&gt;</span>置顶<span class="tag">&lt;/<span class="name">span</span>&gt;</span></span><br><span class="line">								<span class="tag">&lt;<span class="name">span</span> <span class="attr">class</span>=<span class="string">&quot;badge badge-secondary bg-danger&quot;</span> <span class="attr">th:if</span>=<span class="string">&quot;$&#123;map.post.status==1&#125;&quot;</span>&gt;</span>精华<span class="tag">&lt;/<span class="name">span</span>&gt;</span></span><br><span class="line">							<span class="tag">&lt;/<span class="name">h6</span>&gt;</span></span><br><span class="line">							<span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;text-muted font-size-12&quot;</span>&gt;</span></span><br><span class="line">								<span class="tag">&lt;<span class="name">u</span> <span class="attr">class</span>=<span class="string">&quot;mr-3&quot;</span> <span class="attr">th:utext</span>=<span class="string">&quot;$&#123;map.user.username&#125;&quot;</span>&gt;</span>寒江雪<span class="tag">&lt;/<span class="name">u</span>&gt;</span> 发布于 <span class="tag">&lt;<span class="name">b</span> <span class="attr">th:text</span>=<span class="string">&quot;$&#123;#dates.format(map.post.createTime,&#x27;yyyy-MM-dd HH:mm:ss&#x27;)&#125;&quot;</span>&gt;</span>2019-04-15 15:32:18<span class="tag">&lt;/<span class="name">b</span>&gt;</span></span><br><span class="line">								<span class="tag">&lt;<span class="name">ul</span> <span class="attr">class</span>=<span class="string">&quot;d-inline float-right&quot;</span>&gt;</span></span><br><span class="line">									<span class="tag">&lt;<span class="name">li</span> <span class="attr">class</span>=<span class="string">&quot;d-inline ml-2&quot;</span>&gt;</span>赞 11<span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">									<span class="tag">&lt;<span class="name">li</span> <span class="attr">class</span>=<span class="string">&quot;d-inline ml-2&quot;</span>&gt;</span>|<span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">									<span class="tag">&lt;<span class="name">li</span> <span class="attr">class</span>=<span class="string">&quot;d-inline ml-2&quot;</span>&gt;</span>回帖 7<span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">								<span class="tag">&lt;/<span class="name">ul</span>&gt;</span></span><br><span class="line">							<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">						<span class="tag">&lt;/<span class="name">div</span>&gt;</span>						</span><br><span class="line">					<span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>首先，我们可以看出，这是一个<strong>li列表</strong>。为了能让列表根据传进来的数据进行循环渲染，我在li便签里面添加了一个<strong>th:each</strong>属性，来进行循环渲染。</p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">li</span> <span class="attr">class</span>=<span class="string">&quot;media pb-3 pt-3 mb-3 border-bottom&quot;</span> <span class="attr">th:each</span>=<span class="string">&quot;map:$&#123;discussPosts&#125;&quot;</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>在thymeleaf中，用${变量名}从环境中获取controller传递进来的数据。这里我就获取到了<strong>discussPosts变量</strong>，并给这个变量起了个别名<strong>“map”</strong>，用于在循环中使用。有前面的java代码可以知道，<strong>discussPosts</strong>就是一个列表。所以这个列表里面有多少个元素，这个li标签就会被循环渲染多少次。</p>
+<p>在模板中，想要用变量来表示资源文件的路径也很简单。语法跟引入静态文件语法类似。就以上面的img标签举例子</p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">img</span> <span class="attr">th:src</span>=<span class="string">&quot;$&#123;map.user.headerUrl&#125;&quot;</span> <span class="attr">class</span>=<span class="string">&quot;mr-4 rounded-circle&quot;</span> <span class="attr">alt</span>=<span class="string">&quot;用户头像&quot;</span> <span class="attr">style</span>=<span class="string">&quot;width:50px;height:50px;&quot;</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>在这里，我们用<strong>th:src</strong>替换了src属性，这样就可以使用变量来表示地址了。</p>
+<p><code>$&#123;map.user.headerUrl&#125;</code> 这个访问可以分为两个过程：</p>
+<ol>
+<li>因为map是我们在前面定义的discussPosts的一个元素，thymeleaf会自动识别出来我们这个元的的类型是一个<strong>Map</strong>,所以，我们使用<strong>map.user</strong>实际上就等价于<strong>map.get(“user”)</strong>.返回了一个User对象。</li>
+<li>前面返回了一个User对象，这是一个bean，所以我们在使用<strong>user.headUrl</strong>的时候，就相当于调用了user.getHeadUrl()方法，即调用了相应的getter方法，这样就是获取到数据了。</li>
+</ol>
+<h4 id="常用标签"><a href="#常用标签" class="headerlink" title="常用标签"></a>常用标签</h4><p>在模板中，想要用变量来替换标签的值，可以在标签中使用<strong>th:text</strong>属性。如下：</p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">&quot;#&quot;</span> <span class="attr">th:utext</span>=<span class="string">&quot;$&#123;map.post.title&#125;&quot;</span>&gt;</span>备战春招，面试刷题跟他复习，一个月全搞定！<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>这样就会用**${map.post.title}<strong>的值来替换掉“备战春招，面试刷题跟他复习，一个月全搞定！”这段文字了。当然，如果没有文字的话，自然就会直接显示</strong>${map.post.title}**的值了。</p>
+<p>如果标签内的文字有转义字符，例如<strong>&amp;lt;</strong>  代表**&lt;<strong>,如果我们想把转移字符显示出他应该的样子，就不能使用</strong>th:text**,而实使用<strong>th:utext</strong>来代替。</p>
+<p>我们还可以利用<strong>th:if</strong>进行条件渲染。<strong>th:if</strong>后面的条件如果为真，就渲染这个标签，否则就不渲染。</p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">span</span> <span class="attr">class</span>=<span class="string">&quot;badge badge-secondary bg-primary&quot;</span> <span class="attr">th:if</span>=<span class="string">&quot;$&#123;map.post.type==1&#125;&quot;</span>&gt;</span>置顶<span class="tag">&lt;/<span class="name">span</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>进行日期格式化输出的时候。可以使用thymeleaf内置的工具函数。</p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">b</span> <span class="attr">th:text</span>=<span class="string">&quot;$&#123;#dates.format(map.post.createTime,&#x27;yyyy-MM-dd HH:mm:ss&#x27;)&#125;&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">b</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>#dates</strong>表示调用内置的dates函数。</p>
+<p><strong>th:href</strong>如果想用变量来动态生成路径，可以用<code>th:href=&quot;@&#123;$&#123;变量&#125;(参数名=参数值，...)&#125;&quot;</code></p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">class</span>=<span class="string">&quot;page-link&quot;</span> <span class="attr">th:href</span>=<span class="string">&quot;@&#123;$&#123;page.path&#125;(current=1)&#125;&quot;</span>&gt;</span>首页<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>为标签使用动态的class：</p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">li</span> <span class="attr">th:class</span>=<span class="string">&quot;|page-item $&#123;page.current==1?&#x27;disabled&#x27;:&#x27;&#x27;&#125;|&quot;</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>如果class是由固定的class和动态生成的class拼接成的，需要加两个竖线，如上</p>
+<p><strong>th:acton</strong>标签用于表单提交的路径。这个标签会自动设置相对路径，大概是直接设置好项目路径。</p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">form</span> <span class="attr">class</span>=<span class="string">&quot;mt-5&quot;</span> <span class="attr">method</span>=<span class="string">&quot;post&quot;</span> <span class="attr">th:action</span>=<span class="string">&quot;@&#123;/login&#125;&quot;</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>其中<strong>th:action=”@{/login}”**在浏览器端会被渲染为</strong>action=”/community/login”<strong>，其中，</strong>community**是项目的路径。</p>
+]]></content>
+      <categories>
+        <category>Springboot</category>
+      </categories>
+      <tags>
+        <tag>javaweb</tag>
+        <tag>springboot</tag>
+        <tag>thymeleaf</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Springboot事务管理</title>
+    <url>/2020/11/10/Springboot%E4%BA%8B%E5%8A%A1%E7%AE%A1%E7%90%86/</url>
+    <content><![CDATA[<h1 id="Springboot事务管理"><a href="#Springboot事务管理" class="headerlink" title="Springboot事务管理"></a>Springboot事务管理</h1><h3 id="事务的隔离性"><a href="#事务的隔离性" class="headerlink" title="事务的隔离性"></a>事务的隔离性</h3><ul>
+<li>常见的并发异常<ul>
+<li>第一类丢失更新，第二类丢失更新</li>
+<li>脏读，不可重复读，幻读</li>
+</ul>
+</li>
+<li>常见的隔离级别<ul>
+<li>Read Uncommitted：读取未提交的数据 。</li>
+<li>Read Committed：读取已提交的数据。 </li>
+<li>Repeatable Read：可重复读。 </li>
+<li>Serializable：串行化。 </li>
+</ul>
+</li>
+</ul>
+<h4 id="第一类丢失更新"><a href="#第一类丢失更新" class="headerlink" title="第一类丢失更新"></a>第一类丢失更新</h4><p>某一个事务的回滚，导致另外一个事务已更新的数据丢失了。 </p>
+<table>
+<thead>
+<tr>
+<th>时刻</th>
+<th>事务1</th>
+<th>事务2</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>T1</td>
+<td>Read:N=10</td>
+<td></td>
+</tr>
+<tr>
+<td>T2</td>
+<td></td>
+<td>Read:N=10</td>
+</tr>
+<tr>
+<td>T3</td>
+<td></td>
+<td>Write:N=9</td>
+</tr>
+<tr>
+<td>T4</td>
+<td></td>
+<td>Commit:N=9</td>
+</tr>
+<tr>
+<td>T5</td>
+<td>Write:N=11</td>
+<td></td>
+</tr>
+<tr>
+<td>T6</td>
+<td>Rollback: N = 10</td>
+<td></td>
+</tr>
+</tbody></table>
+<p>可见，事务2本身正确提交了，没有回滚，但是事务1却触发了回滚，把正确提交的事务2给覆盖了，这就是第一类丢失更新。</p>
+<h4 id="第二类丢失更新"><a href="#第二类丢失更新" class="headerlink" title="第二类丢失更新"></a>第二类丢失更新</h4><p>某一个事务的提交，导致另外一个事务已更新的数据丢失了。 </p>
+<table>
+<thead>
+<tr>
+<th>时刻</th>
+<th>事务1</th>
+<th>事务2</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>T1</td>
+<td>Read: N = 10</td>
+<td></td>
+</tr>
+<tr>
+<td>T2</td>
+<td></td>
+<td>Read: N = 10</td>
+</tr>
+<tr>
+<td>T3</td>
+<td></td>
+<td>Write:N=9</td>
+</tr>
+<tr>
+<td>T4</td>
+<td></td>
+<td>Commit:N=9</td>
+</tr>
+<tr>
+<td>T5</td>
+<td>Write: N = 11</td>
+<td></td>
+</tr>
+<tr>
+<td>T6</td>
+<td>Commit: N = 11</td>
+<td></td>
+</tr>
+</tbody></table>
+<p>事务2也是正确的提交了，事务1也是正确提交了，但是由于二者并发进行，导致事务1的提交覆盖了事务2的提交，这是第二类丢失更新。</p>
+<h4 id="脏读"><a href="#脏读" class="headerlink" title="脏读"></a>脏读</h4><p>某一个事务，读取了另外一个事务未提交的数据。 </p>
+<table>
+<thead>
+<tr>
+<th>时刻</th>
+<th>事务1</th>
+<th>事务2</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>T1</td>
+<td>Read: N = 10</td>
+<td></td>
+</tr>
+<tr>
+<td>T2</td>
+<td>Write: N = 11</td>
+<td></td>
+</tr>
+<tr>
+<td>T3</td>
+<td></td>
+<td>Read: N = 11</td>
+</tr>
+<tr>
+<td>T4</td>
+<td>Rollback: N = 10</td>
+<td></td>
+</tr>
+</tbody></table>
+<p>T2时刻，事务1写入了N=11，但是没有提交。在T3时刻，事务2读取了事务1写入的N=11，但是事务1在T4时刻触发了回滚，导致N=10，这是事务2读取到的N的值就不正确了。这就是脏读。</p>
+<h4 id="不可重复读"><a href="#不可重复读" class="headerlink" title="不可重复读"></a>不可重复读</h4><p>某一个事务，对同一个数据前后读取的结果不一致。 </p>
+<table>
+<thead>
+<tr>
+<th>时刻</th>
+<th>事务1</th>
+<th>事务2</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>T1</td>
+<td>Read: N = 10</td>
+<td></td>
+</tr>
+<tr>
+<td>T2</td>
+<td></td>
+<td>Read: N = 10</td>
+</tr>
+<tr>
+<td>T3</td>
+<td>Write: N = 11</td>
+<td></td>
+</tr>
+<tr>
+<td>T4</td>
+<td>Commit: N = 11</td>
+<td></td>
+</tr>
+<tr>
+<td>T5</td>
+<td></td>
+<td>Read: N = 11</td>
+</tr>
+</tbody></table>
+<p>在T2时刻，事务2读取到了N=10,但是随后的T3,T4时刻，事务1将N更新为11，在T5时刻事务2又读取N=11，这时事务2读取到的N的值前后矛盾，这就是不可重复读。</p>
+<h4 id="幻读"><a href="#幻读" class="headerlink" title="幻读"></a>幻读</h4><p>某一个事务，对同一个表前后查询到的行数不一致。 </p>
+<table>
+<thead>
+<tr>
+<th>时刻</th>
+<th>事务1</th>
+<th>事务2</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>T1</td>
+<td></td>
+<td>Select: id &lt; 10 (1,2,3)</td>
+</tr>
+<tr>
+<td>T2</td>
+<td>Insert: id = 4</td>
+<td></td>
+</tr>
+<tr>
+<td>T3</td>
+<td>Commit: id = (1,2,3,4)</td>
+<td></td>
+</tr>
+<tr>
+<td>T4</td>
+<td></td>
+<td>Select: id &lt; 10 (1,2,3,4)</td>
+</tr>
+</tbody></table>
+<p>T1时刻事务2读取到了3行数据，而事务1在T2,T3时刻更新id为4行，在T4时刻事务2读取到id为4行。读取到的行数前后矛盾，这就是幻读。</p>
+<h3 id="事务的隔离级别"><a href="#事务的隔离级别" class="headerlink" title="事务的隔离级别"></a>事务的隔离级别</h3><table>
+<thead>
+<tr>
+<th>隔离级别</th>
+<th>第一类丢失更新</th>
+<th>脏读</th>
+<th>第二类丢失更新</th>
+<th>不可重复读</th>
+<th>幻读</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Read Uncommitted</td>
+<td>Y</td>
+<td>Y</td>
+<td>Y</td>
+<td>Y</td>
+<td>Y</td>
+</tr>
+<tr>
+<td>Read Committed</td>
+<td>N</td>
+<td>N</td>
+<td>Y</td>
+<td>Y</td>
+<td>Y</td>
+</tr>
+<tr>
+<td>Repeatable Read</td>
+<td>N</td>
+<td>N</td>
+<td>N</td>
+<td>N</td>
+<td>Y</td>
+</tr>
+<tr>
+<td>Serializable</td>
+<td>N</td>
+<td>N</td>
+<td>N</td>
+<td>N</td>
+<td>N</td>
+</tr>
+</tbody></table>
+<h4 id="事务隔离实现机制"><a href="#事务隔离实现机制" class="headerlink" title="事务隔离实现机制"></a>事务隔离实现机制</h4><ul>
+<li><p>悲观锁（数据库） </p>
+<ul>
+<li><p>共享锁（S锁） </p>
+<p>事务A对某数据加了共享锁后，其他事务只能对该数据加共享锁，但不能加排他锁。 </p>
+</li>
+<li><p>排他锁（X锁） </p>
+<p>事务A对某数据加了排他锁后，其他事务对该数据既不能加共享锁，也不能加排他锁。 </p>
+</li>
+</ul>
+</li>
+<li><p>乐观锁（自定义） </p>
+<ul>
+<li><p>版本号、时间戳等 </p>
+<p>在更新数据前，检查版本号是否发生变化。若变化则取消本次更新，否则就更新数据（版本号+1）。 </p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="事务的传播行为"><a href="#事务的传播行为" class="headerlink" title="事务的传播行为"></a>事务的传播行为</h3><p>事务的传播行为指的是：我有一个A方法，并且为A方法配置了一个隔离级别。然后我在A方法里面调用了B方法。但是我在B方法上也配置了隔离级别。那么，B方法该怎么选择策略进行回滚那？这就是传播行为。</p>
+<table>
+<thead>
+<tr>
+<th>传播行为类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>REQUIRED</td>
+<td>支持当前事务(外部事务),如果不存在则创建新事务.（就是以A方法的事务为准）</td>
+</tr>
+<tr>
+<td>REQUIRES_NEW</td>
+<td>创建一个新事务,并且暂停当前事务(外部事务).就是以B方法自己的事务隔离级别为准</td>
+</tr>
+<tr>
+<td>NESTED</td>
+<td>如果当前存在事务(外部事务),则嵌套在该事务中执行(独立的提交和回滚),否则就会REQUIRED一样.</td>
+</tr>
+</tbody></table>
+<h3 id="Spring事务管理"><a href="#Spring事务管理" class="headerlink" title="Spring事务管理"></a>Spring事务管理</h3><ul>
+<li>声明式事务 <ul>
+<li>通过XML配置，声明某方法的事务特征。 </li>
+<li>通过注解，声明某方法的事务特征。 </li>
+</ul>
+</li>
+<li>编程式事务 <ul>
+<li>通过 TransactionTemplate 管理事务， 并通过它执行数据库的操作。 </li>
+</ul>
+</li>
+</ul>
+<h4 id="Spring事务管理代码演示"><a href="#Spring事务管理代码演示" class="headerlink" title="Spring事务管理代码演示"></a>Spring事务管理代码演示</h4><h5 id="通过注解声明方法的事务"><a href="#通过注解声明方法的事务" class="headerlink" title="通过注解声明方法的事务"></a>通过注解声明方法的事务</h5><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// REQUIRED: 支持当前事务(外部事务),如果不存在则创建新事务.</span></span><br><span class="line">   <span class="comment">// REQUIRES_NEW: 创建一个新事务,并且暂停当前事务(外部事务).</span></span><br><span class="line">   <span class="comment">// NESTED: 如果当前存在事务(外部事务),则嵌套在该事务中执行(独立的提交和回滚),否则就会REQUIRED一		样.</span></span><br><span class="line">   <span class="meta">@Transactional(isolation = Isolation.READ_COMMITTED, propagation = 			             Propagation.REQUIRED)</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> Object <span class="title">save1</span><span class="params">()</span> </span>&#123;</span><br><span class="line">       <span class="comment">// 新增用户</span></span><br><span class="line">       User user = <span class="keyword">new</span> User();</span><br><span class="line">       user.setUsername(<span class="string">&quot;alpha&quot;</span>);</span><br><span class="line">       user.setSalt(CommunityUtil.generateUUID().substring(<span class="number">0</span>, <span class="number">5</span>));</span><br><span class="line">       user.setPassword(CommunityUtil.md5(<span class="string">&quot;123&quot;</span> + user.getSalt()));</span><br><span class="line">       user.setEmail(<span class="string">&quot;alpha@qq.com&quot;</span>);</span><br><span class="line">       user.setHeaderUrl(<span class="string">&quot;http://image.nowcoder.com/head/99t.png&quot;</span>);</span><br><span class="line">       user.setCreateTime(<span class="keyword">new</span> Date());</span><br><span class="line">       userMapper.insertUser(user);</span><br><span class="line"></span><br><span class="line">       <span class="comment">// 新增帖子</span></span><br><span class="line">       DiscussPost post = <span class="keyword">new</span> DiscussPost();</span><br><span class="line">       post.setUserId(user.getId());</span><br><span class="line">       post.setTitle(<span class="string">&quot;Hello&quot;</span>);</span><br><span class="line">       post.setContent(<span class="string">&quot;新人报道!&quot;</span>);</span><br><span class="line">       post.setCreateTime(<span class="keyword">new</span> Date());</span><br><span class="line">       discussPostMapper.insertDiscussPost(post);</span><br><span class="line"></span><br><span class="line">       Integer.valueOf(<span class="string">&quot;abc&quot;</span>);</span><br><span class="line"></span><br><span class="line">       <span class="keyword">return</span> <span class="string">&quot;ok&quot;</span>;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+
+<p>通过**@Transactional**注解来指定事务的隔离级别和事务的传播行为。</p>
+<h5 id="通过编程用TransactionTemplate-来管理事务"><a href="#通过编程用TransactionTemplate-来管理事务" class="headerlink" title="通过编程用TransactionTemplate 来管理事务"></a>通过编程用TransactionTemplate 来管理事务</h5><figure class="highlight java"><table><tr><td class="code"><pre><span class="line">	<span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> TransactionTemplate transactionTemplate;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> Object <span class="title">save2</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        		transactionTemplate.setIsolationLevel(TransactionDefinition.ISOLATION_READ_COMMITTED);</span><br><span class="line">       transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> transactionTemplate.execute(<span class="keyword">new</span> TransactionCallback&lt;Object&gt;() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> Object <span class="title">doInTransaction</span><span class="params">(TransactionStatus status)</span> </span>&#123;</span><br><span class="line">                <span class="comment">// 新增用户</span></span><br><span class="line">                User user = <span class="keyword">new</span> User();</span><br><span class="line">                user.setUsername(<span class="string">&quot;beta&quot;</span>);</span><br><span class="line">                user.setSalt(CommunityUtil.generateUUID().substring(<span class="number">0</span>, <span class="number">5</span>));</span><br><span class="line">                user.setPassword(CommunityUtil.md5(<span class="string">&quot;123&quot;</span> + user.getSalt()));</span><br><span class="line">                user.setEmail(<span class="string">&quot;beta@qq.com&quot;</span>);</span><br><span class="line">                user.setHeaderUrl(<span class="string">&quot;http://image.nowcoder.com/head/999t.png&quot;</span>);</span><br><span class="line">                user.setCreateTime(<span class="keyword">new</span> Date());</span><br><span class="line">                userMapper.insertUser(user);</span><br><span class="line"></span><br><span class="line">                <span class="comment">// 新增帖子</span></span><br><span class="line">                DiscussPost post = <span class="keyword">new</span> DiscussPost();</span><br><span class="line">                post.setUserId(user.getId());</span><br><span class="line">                post.setTitle(<span class="string">&quot;你好&quot;</span>);</span><br><span class="line">                post.setContent(<span class="string">&quot;我是新人!&quot;</span>);</span><br><span class="line">                post.setCreateTime(<span class="keyword">new</span> Date());</span><br><span class="line">                discussPostMapper.insertDiscussPost(post);</span><br><span class="line"></span><br><span class="line">                Integer.valueOf(<span class="string">&quot;abc&quot;</span>);</span><br><span class="line"></span><br><span class="line">                <span class="keyword">return</span> <span class="string">&quot;ok&quot;</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>]]></content>
+      <categories>
+        <category>Springboot</category>
+      </categories>
+      <tags>
+        <tag>事务</tag>
+        <tag>Springboot</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Springboot使用redis</title>
+    <url>/2020/11/10/Springboot%E4%BD%BF%E7%94%A8redis/</url>
+    <content><![CDATA[<h1 id="Springboot使用redis"><a href="#Springboot使用redis" class="headerlink" title="Springboot使用redis"></a>Springboot使用redis</h1><h3 id="首先，引入redis依赖"><a href="#首先，引入redis依赖" class="headerlink" title="首先，引入redis依赖"></a>首先，引入redis依赖</h3><figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-data-redis<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="编辑配置文件"><a href="#编辑配置文件" class="headerlink" title="编辑配置文件"></a>编辑配置文件</h3><figure class="highlight properties"><table><tr><td class="code"><pre><span class="line"><span class="comment"># RedisProperties</span></span><br><span class="line"><span class="comment">#选择redis的那个数据库</span></span><br><span class="line"><span class="meta">spring.redis.database</span>=<span class="string">11</span></span><br><span class="line"><span class="meta">spring.redis.host</span>=<span class="string">localhost</span></span><br><span class="line"><span class="meta">spring.redis.port</span>=<span class="string">6379</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="编写配置类，构造RedisTemplate"><a href="#编写配置类，构造RedisTemplate" class="headerlink" title="编写配置类，构造RedisTemplate"></a>编写配置类，构造RedisTemplate</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RedisConfig</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//在定义bean的时候，函数里面的参数会被spring自动注入</span></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> RedisTemplate&lt;String, Object&gt; <span class="title">redisTemplate</span><span class="params">(RedisConnectionFactory factory)</span> </span>&#123;</span><br><span class="line">        RedisTemplate&lt;String, Object&gt; template = <span class="keyword">new</span> RedisTemplate&lt;&gt;();</span><br><span class="line">        template.setConnectionFactory(factory);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 设置key的序列化方式</span></span><br><span class="line">        template.setKeySerializer(RedisSerializer.string());</span><br><span class="line">        <span class="comment">// 设置value的序列化方式</span></span><br><span class="line">        template.setValueSerializer(RedisSerializer.json());</span><br><span class="line">        <span class="comment">// 设置hash的key的序列化方式</span></span><br><span class="line">        template.setHashKeySerializer(RedisSerializer.string());</span><br><span class="line">        <span class="comment">// 设置hash的value的序列化方式</span></span><br><span class="line">        template.setHashValueSerializer(RedisSerializer.json());</span><br><span class="line"></span><br><span class="line">        template.afterPropertiesSet();</span><br><span class="line">        <span class="keyword">return</span> template;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>编写配置类是因为springboot默认配置的redis的键的类型是object，我们为了方便，需要把键改为string类型。</p>
+<h3 id="测试java代码"><a href="#测试java代码" class="headerlink" title="测试java代码"></a>测试java代码</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Autowired</span></span><br><span class="line">   <span class="keyword">private</span> RedisTemplate redisTemplate;</span><br><span class="line"></span><br><span class="line">   <span class="meta">@Test</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testStrings</span><span class="params">()</span> </span>&#123;</span><br><span class="line">       String redisKey = <span class="string">&quot;test:count&quot;</span>;</span><br><span class="line"></span><br><span class="line">       redisTemplate.opsForValue().set(redisKey, <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">       System.out.println(redisTemplate.opsForValue().get(redisKey));</span><br><span class="line">       System.out.println(redisTemplate.opsForValue().increment(redisKey));</span><br><span class="line">       System.out.println(redisTemplate.opsForValue().decrement(redisKey));</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Test</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testHashes</span><span class="params">()</span> </span>&#123;</span><br><span class="line">       String redisKey = <span class="string">&quot;test:user&quot;</span>;</span><br><span class="line"></span><br><span class="line">       redisTemplate.opsForHash().put(redisKey, <span class="string">&quot;id&quot;</span>, <span class="number">1</span>);</span><br><span class="line">       redisTemplate.opsForHash().put(redisKey, <span class="string">&quot;username&quot;</span>, <span class="string">&quot;zhangsan&quot;</span>);</span><br><span class="line"></span><br><span class="line">       System.out.println(redisTemplate.opsForHash().get(redisKey, <span class="string">&quot;id&quot;</span>));</span><br><span class="line">       System.out.println(redisTemplate.opsForHash().get(redisKey, <span class="string">&quot;username&quot;</span>));</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Test</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testLists</span><span class="params">()</span> </span>&#123;</span><br><span class="line">       String redisKey = <span class="string">&quot;test:ids&quot;</span>;</span><br><span class="line"></span><br><span class="line">       redisTemplate.opsForList().leftPush(redisKey, <span class="number">101</span>);</span><br><span class="line">       redisTemplate.opsForList().leftPush(redisKey, <span class="number">102</span>);</span><br><span class="line">       redisTemplate.opsForList().leftPush(redisKey, <span class="number">103</span>);</span><br><span class="line"></span><br><span class="line">       System.out.println(redisTemplate.opsForList().size(redisKey));</span><br><span class="line">       System.out.println(redisTemplate.opsForList().index(redisKey, <span class="number">0</span>));</span><br><span class="line">       System.out.println(redisTemplate.opsForList().range(redisKey, <span class="number">0</span>, <span class="number">2</span>));</span><br><span class="line"></span><br><span class="line">       System.out.println(redisTemplate.opsForList().leftPop(redisKey));</span><br><span class="line">       System.out.println(redisTemplate.opsForList().leftPop(redisKey));</span><br><span class="line">       System.out.println(redisTemplate.opsForList().leftPop(redisKey));</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Test</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testSets</span><span class="params">()</span> </span>&#123;</span><br><span class="line">       String redisKey = <span class="string">&quot;test:teachers&quot;</span>;</span><br><span class="line"></span><br><span class="line">       redisTemplate.opsForSet().add(redisKey, <span class="string">&quot;刘备&quot;</span>, <span class="string">&quot;关羽&quot;</span>, <span class="string">&quot;张飞&quot;</span>, <span class="string">&quot;赵云&quot;</span>, <span class="string">&quot;诸葛亮&quot;</span>);</span><br><span class="line"></span><br><span class="line">       System.out.println(redisTemplate.opsForSet().size(redisKey));</span><br><span class="line">       System.out.println(redisTemplate.opsForSet().pop(redisKey));</span><br><span class="line">       System.out.println(redisTemplate.opsForSet().members(redisKey));</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Test</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testSortedSets</span><span class="params">()</span> </span>&#123;</span><br><span class="line">       String redisKey = <span class="string">&quot;test:students&quot;</span>;</span><br><span class="line"></span><br><span class="line">       redisTemplate.opsForZSet().add(redisKey, <span class="string">&quot;唐僧&quot;</span>, <span class="number">80</span>);</span><br><span class="line">       redisTemplate.opsForZSet().add(redisKey, <span class="string">&quot;悟空&quot;</span>, <span class="number">90</span>);</span><br><span class="line">       redisTemplate.opsForZSet().add(redisKey, <span class="string">&quot;八戒&quot;</span>, <span class="number">50</span>);</span><br><span class="line">       redisTemplate.opsForZSet().add(redisKey, <span class="string">&quot;沙僧&quot;</span>, <span class="number">70</span>);</span><br><span class="line">       redisTemplate.opsForZSet().add(redisKey, <span class="string">&quot;白龙马&quot;</span>, <span class="number">60</span>);</span><br><span class="line"></span><br><span class="line">       <span class="comment">//统计有多少个成员</span></span><br><span class="line">       System.out.println(redisTemplate.opsForZSet().zCard(redisKey));</span><br><span class="line">       <span class="comment">//统计某一个成员的分数</span></span><br><span class="line">       System.out.println(redisTemplate.opsForZSet().score(redisKey, <span class="string">&quot;八戒&quot;</span>));</span><br><span class="line">       <span class="comment">//统计一个成员的排名，倒序，返回的是索引，从零开始</span></span><br><span class="line">       System.out.println(redisTemplate.opsForZSet().reverseRank(redisKey, <span class="string">&quot;八戒&quot;</span>));</span><br><span class="line">       <span class="comment">//取排名范围内的数据，倒序</span></span><br><span class="line">       System.out.println(redisTemplate.opsForZSet().reverseRange(redisKey, <span class="number">0</span>, <span class="number">2</span>));</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Test</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testKeys</span><span class="params">()</span> </span>&#123;</span><br><span class="line">       redisTemplate.delete(<span class="string">&quot;test:user&quot;</span>);</span><br><span class="line"></span><br><span class="line">       System.out.println(redisTemplate.hasKey(<span class="string">&quot;test:user&quot;</span>));</span><br><span class="line"></span><br><span class="line">       <span class="comment">//设置key过期的时间</span></span><br><span class="line">       redisTemplate.expire(<span class="string">&quot;test:students&quot;</span>, <span class="number">10</span>, TimeUnit.SECONDS);</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 多次访问同一个key</span></span><br><span class="line">   <span class="meta">@Test</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testBoundOperations</span><span class="params">()</span> </span>&#123;</span><br><span class="line">       String redisKey = <span class="string">&quot;test:count&quot;</span>;</span><br><span class="line">       <span class="comment">//这个对象简化了写法，就不用传key了</span></span><br><span class="line">       BoundValueOperations operations = redisTemplate.boundValueOps(redisKey);</span><br><span class="line">       operations.increment();</span><br><span class="line">       operations.increment();</span><br><span class="line">       operations.increment();</span><br><span class="line">       operations.increment();</span><br><span class="line">       operations.increment();</span><br><span class="line">       System.out.println(operations.get());</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line"> <span class="comment">// 编程式事务</span></span><br><span class="line">   <span class="meta">@Test</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testTransactional</span><span class="params">()</span> </span>&#123;</span><br><span class="line">       Object obj = redisTemplate.execute(<span class="keyword">new</span> SessionCallback() &#123;</span><br><span class="line">           <span class="meta">@Override</span></span><br><span class="line">           <span class="function"><span class="keyword">public</span> Object <span class="title">execute</span><span class="params">(RedisOperations operations)</span> <span class="keyword">throws</span> DataAccessException </span>&#123;</span><br><span class="line">               String redisKey = <span class="string">&quot;test:tx&quot;</span>;</span><br><span class="line"></span><br><span class="line">               operations.multi();</span><br><span class="line"></span><br><span class="line">               operations.opsForSet().add(redisKey, <span class="string">&quot;zhangsan&quot;</span>);</span><br><span class="line">               operations.opsForSet().add(redisKey, <span class="string">&quot;lisi&quot;</span>);</span><br><span class="line">               operations.opsForSet().add(redisKey, <span class="string">&quot;wangwu&quot;</span>);</span><br><span class="line"></span><br><span class="line">               System.out.println(operations.opsForSet().members(redisKey));</span><br><span class="line"></span><br><span class="line">               <span class="keyword">return</span> operations.exec();</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;);</span><br><span class="line">       System.out.println(obj);</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>]]></content>
+      <categories>
+        <category>Springboot</category>
+      </categories>
+      <tags>
+        <tag>Springboot</tag>
+        <tag>redis</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Springboot使用验证码--Kaptcha</title>
+    <url>/2020/11/10/Springboot%E4%BD%BF%E7%94%A8%E9%AA%8C%E8%AF%81%E7%A0%81-Kaptcha/</url>
+    <content><![CDATA[<h1 id="Springboot使用验证码–Kaptcha"><a href="#Springboot使用验证码–Kaptcha" class="headerlink" title="Springboot使用验证码–Kaptcha"></a>Springboot使用验证码–Kaptcha</h1><h3 id="引入Kaptcha依赖"><a href="#引入Kaptcha依赖" class="headerlink" title="引入Kaptcha依赖"></a>引入Kaptcha依赖</h3><figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.github.penggle<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>kaptcha<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">version</span>&gt;</span>2.3.2<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="创建一个Kaptcha配置类"><a href="#创建一个Kaptcha配置类" class="headerlink" title="创建一个Kaptcha配置类"></a>创建一个Kaptcha配置类</h3><p>利用java配置的方式，创建一个配置类，利用**@Bean**注解返回一个对象。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">KaptchaConfig</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Producer <span class="title">kaptchaProducer</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        Properties properties = <span class="keyword">new</span> Properties();</span><br><span class="line">        <span class="comment">//图片的宽度</span></span><br><span class="line">        properties.setProperty(<span class="string">&quot;kaptcha.image.width&quot;</span>, <span class="string">&quot;100&quot;</span>);</span><br><span class="line">        <span class="comment">//图片的高度</span></span><br><span class="line">        properties.setProperty(<span class="string">&quot;kaptcha.image.height&quot;</span>, <span class="string">&quot;40&quot;</span>);</span><br><span class="line">        <span class="comment">//设置字体大小</span></span><br><span class="line">        properties.setProperty(<span class="string">&quot;kaptcha.textproducer.font.size&quot;</span>, <span class="string">&quot;32&quot;</span>);</span><br><span class="line">        <span class="comment">//设置字体颜色</span></span><br><span class="line">        properties.setProperty(<span class="string">&quot;kaptcha.textproducer.font.color&quot;</span>, <span class="string">&quot;0,0,0&quot;</span>);</span><br><span class="line">        <span class="comment">//设置验证码的字符集</span></span><br><span class="line">        properties.setProperty(<span class="string">&quot;kaptcha.textproducer.char.string&quot;</span>, <span class="string">&quot;0123456789ABCDEFGHIJKLMNOPQRSTUVWXYAZ&quot;</span>);</span><br><span class="line">        <span class="comment">//设置验证码长度</span></span><br><span class="line">        properties.setProperty(<span class="string">&quot;kaptcha.textproducer.char.length&quot;</span>, <span class="string">&quot;4&quot;</span>);</span><br><span class="line">        <span class="comment">//给验证码选择一个干扰类，用于生成一些线，点等等特效用于防破解</span></span><br><span class="line">        properties.setProperty(<span class="string">&quot;kaptcha.noise.impl&quot;</span>, <span class="string">&quot;com.google.code.kaptcha.impl.NoNoise&quot;</span>);</span><br><span class="line"></span><br><span class="line">        DefaultKaptcha kaptcha = <span class="keyword">new</span> DefaultKaptcha();</span><br><span class="line">        Config config = <span class="keyword">new</span> Config(properties);</span><br><span class="line">        kaptcha.setConfig(config);</span><br><span class="line">        <span class="keyword">return</span> kaptcha;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="在Controller里面创建一个方法，用于给浏览器返回验证码图片"><a href="#在Controller里面创建一个方法，用于给浏览器返回验证码图片" class="headerlink" title="在Controller里面创建一个方法，用于给浏览器返回验证码图片"></a>在Controller里面创建一个方法，用于给浏览器返回验证码图片</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Autowired</span></span><br><span class="line"><span class="keyword">private</span> Producer kaptchaProducer;</span><br><span class="line"></span><br><span class="line"><span class="meta">@RequestMapping(path = &quot;/kaptcha&quot;, method = RequestMethod.GET)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">getKaptcha</span><span class="params">(HttpServletResponse response, HttpSession session)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 生成验证码</span></span><br><span class="line">        String text = kaptchaProducer.createText();</span><br><span class="line">        BufferedImage image = kaptchaProducer.createImage(text);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 将验证码存入session</span></span><br><span class="line">        session.setAttribute(<span class="string">&quot;kaptcha&quot;</span>, text);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 将图片输出给浏览器</span></span><br><span class="line">        response.setContentType(<span class="string">&quot;image/png&quot;</span>);</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            OutputStream os = response.getOutputStream();</span><br><span class="line">            ImageIO.write(image, <span class="string">&quot;png&quot;</span>, os);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            logger.error(<span class="string">&quot;响应验证码失败:&quot;</span> + e.getMessage());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>首先，我们需要生成一段验证码，然后把验证码字符串存入session，用于之后的验证。然后，利用response对象，向浏览器返回图片。分为两步：</p>
+<ol>
+<li><p>设置response类型为image类型</p>
+<p><code> response.setContentType(&quot;image/png&quot;);</code></p>
+</li>
+<li><p>获取response的输出流，利用ImageIO类向输出流写入图片数据。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">            OutputStream os = response.getOutputStream();</span><br><span class="line">            ImageIO.write(image, <span class="string">&quot;png&quot;</span>, os);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            logger.error(<span class="string">&quot;响应验证码失败:&quot;</span> + e.getMessage());</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ol>
+<h3 id="将模板中验证码图片的路径修改为对应Controller的路径"><a href="#将模板中验证码图片的路径修改为对应Controller的路径" class="headerlink" title="将模板中验证码图片的路径修改为对应Controller的路径"></a>将模板中验证码图片的路径修改为对应Controller的路径</h3><p>直接看代码：</p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;col-sm-4&quot;</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">img</span> <span class="attr">th:src</span>=<span class="string">&quot;@&#123;/kaptcha&#125;&quot;</span> <span class="attr">id</span>=<span class="string">&quot;kaptcha&quot;</span> <span class="attr">style</span>=<span class="string">&quot;width:100px;height:40px;&quot;</span> <span class="attr">class</span>=<span class="string">&quot;mr-2&quot;</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">&quot;javascript:refresh_kaptcha();&quot;</span> <span class="attr">class</span>=<span class="string">&quot;font-size-12 align-bottom&quot;</span>&gt;</span>刷新验证码<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>其中，**th:src=”@{/kaptcha}”**就是我们前面控制器写的路径。现在，我们访问页面应该就能拿到验证码图片了，并且验证码对应的字符串我们也存到了session里面，下面就是进行验证了。在实现验证之前，我先实现一下刷新验证码的功能。</p>
+<h3 id="实现刷新验证码的功能"><a href="#实现刷新验证码的功能" class="headerlink" title="实现刷新验证码的功能"></a>实现刷新验证码的功能</h3><p>直接看代码：</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> CONTEXT_PATH = <span class="string">&quot;/community&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">refresh_kaptcha</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    	<span class="comment">//每次加一个随机数是为了防止请求路径相同，浏览器直接返回缓存，造成图片不刷新</span></span><br><span class="line">		<span class="keyword">var</span> path = CONTEXT_PATH + <span class="string">&quot;/kaptcha?p=&quot;</span> + <span class="built_in">Math</span>.random();</span><br><span class="line">		$(<span class="string">&quot;#kaptcha&quot;</span>).attr(<span class="string">&quot;src&quot;</span>, path);</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="验证"><a href="#验证" class="headerlink" title="验证"></a>验证</h3><p>直接在登录的controller方法中从session中获取验证码字符串，在跟从浏览器提交的验证码对比就行了。</p>
+]]></content>
+      <categories>
+        <category>Springboot</category>
+      </categories>
+      <tags>
+        <tag>Springboot</tag>
+        <tag>验证码</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Springboot开发文件上传功能</title>
+    <url>/2020/11/10/Springboot%E5%BC%80%E5%8F%91%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E5%8A%9F%E8%83%BD/</url>
+    <content><![CDATA[<h1 id="Springboot开发文件上传功能"><a href="#Springboot开发文件上传功能" class="headerlink" title="Springboot开发文件上传功能"></a>Springboot开发文件上传功能</h1><h3 id="服务端准备"><a href="#服务端准备" class="headerlink" title="服务端准备"></a>服务端准备</h3><p>首先，需要在配置文件中配置上传路径，然后声明一个变量<strong>contextPath</strong>，并将文件路径属性注入，然后创建一个Controller：<strong>uploadHeader</strong>，这里我们以头像上传功能举例子来说明。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Value(&quot;$&#123;community.path.upload&#125;&quot;)</span></span><br><span class="line">   <span class="keyword">private</span> String uploadPath;</span><br><span class="line"></span><br><span class="line">   <span class="meta">@Value(&quot;$&#123;community.path.domain&#125;&quot;)</span></span><br><span class="line">   <span class="keyword">private</span> String domain;</span><br><span class="line"></span><br><span class="line">   <span class="meta">@Value(&quot;$&#123;server.servlet.context-path&#125;&quot;)</span></span><br><span class="line">   <span class="keyword">private</span> String contextPath;</span><br><span class="line"></span><br><span class="line"><span class="meta">@RequestMapping(path = &quot;/upload&quot;, method = RequestMethod.POST)</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> String <span class="title">uploadHeader</span><span class="params">(MultipartFile headerImage, Model model)</span> </span>&#123;</span><br><span class="line">       <span class="keyword">if</span> (headerImage == <span class="keyword">null</span>) &#123;</span><br><span class="line">           model.addAttribute(<span class="string">&quot;error&quot;</span>, <span class="string">&quot;您还没有选择图片!&quot;</span>);</span><br><span class="line">           <span class="keyword">return</span> <span class="string">&quot;/site/setting&quot;</span>;</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       String fileName = headerImage.getOriginalFilename();</span><br><span class="line">       String suffix = fileName.substring(fileName.lastIndexOf(<span class="string">&quot;.&quot;</span>));</span><br><span class="line">       <span class="keyword">if</span> (StringUtils.isBlank(suffix)) &#123;</span><br><span class="line">           model.addAttribute(<span class="string">&quot;error&quot;</span>, <span class="string">&quot;文件的格式不正确!&quot;</span>);</span><br><span class="line">           <span class="keyword">return</span> <span class="string">&quot;/site/setting&quot;</span>;</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       <span class="comment">// 生成随机文件名</span></span><br><span class="line">       fileName = CommunityUtil.generateUUID() + suffix;</span><br><span class="line">       <span class="comment">// 确定文件存放的路径</span></span><br><span class="line">       File dest = <span class="keyword">new</span> File(uploadPath + <span class="string">&quot;/&quot;</span> + fileName);</span><br><span class="line">       <span class="keyword">try</span> &#123;</span><br><span class="line">           <span class="comment">// 存储文件</span></span><br><span class="line">           headerImage.transferTo(dest);</span><br><span class="line">       &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">           logger.error(<span class="string">&quot;上传文件失败: &quot;</span> + e.getMessage());</span><br><span class="line">           <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">&quot;上传文件失败,服务器发生异常!&quot;</span>, e);</span><br><span class="line">       &#125;</span><br><span class="line">       <span class="comment">// 更新当前用户的头像的路径(web访问路径)</span></span><br><span class="line">       <span class="comment">// http://localhost:8080/community/user/header/xxx.png</span></span><br><span class="line">       User user = hostHolder.getUser();</span><br><span class="line">       String headerUrl = domain + contextPath + <span class="string">&quot;/user/header/&quot;</span> + fileName;</span><br><span class="line">       userService.updateHeader(user.getId(), headerUrl);</span><br><span class="line"></span><br><span class="line">       <span class="keyword">return</span> <span class="string">&quot;redirect:/index&quot;</span>;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+
+<p>SpringMVC为我们提供了一个文件上传类，<strong>MultipartFile</strong>，如果是多个文件，就用数组来表示。首先，我利用文件后缀来判断文件格式是否正确，然后 给文件重新分配一个新的随机的名字。然后调用· <code> </code> <code>headerImage.transferTo(dest);</code>来进行文件上传。</p>
+<h3 id="前端页面准备"><a href="#前端页面准备" class="headerlink" title="前端页面准备"></a>前端页面准备</h3><p>前端需要定义一个表单，并且请求方法一定为POST，并且具备**enctype=”multipart/form-data”**这个属性。</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">form</span> <span class="attr">class</span>=<span class="string">&quot;mt-5&quot;</span> <span class="attr">method</span>=<span class="string">&quot;post&quot;</span> <span class="attr">enctype</span>=<span class="string">&quot;multipart/form-data&quot;</span> <span class="attr">th:action</span>=<span class="string">&quot;@&#123;/user/upload&#125;&quot;</span>&gt;</span></span><br><span class="line">					<span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;form-group row mt-4&quot;</span>&gt;</span></span><br><span class="line">						<span class="tag">&lt;<span class="name">label</span> <span class="attr">for</span>=<span class="string">&quot;head-image&quot;</span> <span class="attr">class</span>=<span class="string">&quot;col-sm-2 col-form-label text-right&quot;</span>&gt;</span>选择头像:<span class="tag">&lt;/<span class="name">label</span>&gt;</span></span><br><span class="line">						<span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;col-sm-10&quot;</span>&gt;</span></span><br><span class="line">							<span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;custom-file&quot;</span>&gt;</span></span><br><span class="line">								<span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">&quot;file&quot;</span> <span class="attr">th:class</span>=<span class="string">&quot;|custom-file-input $&#123;error!=null?&#x27;is-invalid&#x27;:&#x27;&#x27;&#125;|&quot;</span></span></span><br><span class="line"><span class="tag">									   <span class="attr">id</span>=<span class="string">&quot;head-image&quot;</span> <span class="attr">name</span>=<span class="string">&quot;headerImage&quot;</span> <span class="attr">lang</span>=<span class="string">&quot;es&quot;</span> <span class="attr">required</span>=<span class="string">&quot;&quot;</span>&gt;</span></span><br><span class="line">								<span class="tag">&lt;<span class="name">label</span> <span class="attr">class</span>=<span class="string">&quot;custom-file-label&quot;</span> <span class="attr">for</span>=<span class="string">&quot;head-image&quot;</span> <span class="attr">data-browse</span>=<span class="string">&quot;文件&quot;</span>&gt;</span>选择一张图片<span class="tag">&lt;/<span class="name">label</span>&gt;</span></span><br><span class="line">								<span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;invalid-feedback&quot;</span> <span class="attr">th:text</span>=<span class="string">&quot;$&#123;error&#125;&quot;</span>&gt;</span></span><br><span class="line">									该账号不存在!</span><br><span class="line">								<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">							<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">						<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">					<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">					<span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;form-group row mt-4&quot;</span>&gt;</span></span><br><span class="line">						<span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;col-sm-2&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">						<span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;col-sm-10 text-center&quot;</span>&gt;</span></span><br><span class="line">							<span class="tag">&lt;<span class="name">button</span> <span class="attr">type</span>=<span class="string">&quot;submit&quot;</span> <span class="attr">class</span>=<span class="string">&quot;btn btn-info text-white form-control&quot;</span>&gt;</span>立即上传<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span><br><span class="line">						<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">					<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">				<span class="tag">&lt;/<span class="name">form</span>&gt;</span></span><br></pre></td></tr></table></figure>]]></content>
+      <categories>
+        <category>Springboot</category>
+      </categories>
+      <tags>
+        <tag>javaweb</tag>
+        <tag>Springboot</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>docker基本使用</title>
+    <url>/2020/11/21/docker%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8/</url>
+    <content><![CDATA[<h1 id="docker基本使用"><a href="#docker基本使用" class="headerlink" title="docker基本使用"></a>docker基本使用</h1><h2 id="基本操作"><a href="#基本操作" class="headerlink" title="基本操作"></a>基本操作</h2><p>使用docker的时候必须使用root权限。所以在使用前，最好将使用docker的用户加入到<strong>docker</strong>这个用户组（docker用户组和root的权限一样）</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo usermod -aG docker <span class="variable">$&#123;USER&#125;</span></span><br><span class="line">sudo service docker restart</span><br></pre></td></tr></table></figure>
+
+<h3 id="搜索镜像-docker-search"><a href="#搜索镜像-docker-search" class="headerlink" title="搜索镜像(docker search)"></a>搜索镜像(docker search)</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker search 镜像名</span><br></pre></td></tr></table></figure>
+
+<p>使用docker search 命令可以在dockers hub中搜索镜像，例如</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker search ubuntu</span><br></pre></td></tr></table></figure>
+
+<p>结果如下：</p>
+<p><a href="https://imgchr.com/i/D1tW9I"><img src="https://s3.ax1x.com/2020/11/21/D1tW9I.png" alt="D1tW9I.png"></a></p>
+<h3 id="下载镜像-docker-pull"><a href="#下载镜像-docker-pull" class="headerlink" title="下载镜像(docker pull)"></a>下载镜像(docker pull)</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker pull 镜像名:标签</span><br></pre></td></tr></table></figure>
+
+<p>docker pull可以从dockers hub中下载镜像。如果想要下载指定用户上传的镜像，则利用一下语法：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker pull 用户名/镜像名:标签</span><br></pre></td></tr></table></figure>
+
+<h3 id="列出镜像-docker-images"><a href="#列出镜像-docker-images" class="headerlink" title="列出镜像(docker images)"></a>列出镜像(docker images)</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker images</span><br></pre></td></tr></table></figure>
+
+<p>这个命令可以列出当前主机中的所有镜像。如果在后面指定了名称的话，则只列出名称相同但标签不同的镜像。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker images ubuntu</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://imgchr.com/i/D1UKyV"><img src="https://s3.ax1x.com/2020/11/21/D1UKyV.png" alt="D1UKyV.png"></a></p>
+<h3 id="创建容器-docker-run"><a href="#创建容器-docker-run" class="headerlink" title="创建容器(docker run)"></a>创建容器(docker run)</h3><ol>
+<li><p>创建容器后，运行shell</p>
+ <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker run -i -t --name hello centos /bin/bash</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>-i -t 两个选项一起使用可以分配一个终端设备然后连接到这个终端。</p>
+</li>
+<li><p>/bin/bash 表示运行容器后直接执行bash</p>
+<p>执行结果：</p>
+<p><a href="https://imgchr.com/i/D1U6fA"><img src="https://s3.ax1x.com/2020/11/21/D1U6fA.png" alt="D1U6fA.png"></a></p>
+<p>可以看到，已经进入了centos的终端。</p>
+</li>
+</ul>
+</li>
+<li><p>后台运行镜像</p>
+ <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker run --name hello-nginx -d -p 80:80 -v /root/data:/data hello:0.1</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>-d 表示以后台的形式运行这个镜像</p>
+</li>
+<li><p>-p 表示映射端口，主机端口号：容器端口号</p>
+</li>
+<li><p>-v 表示将主机的/root/data目录连接到容器的/data目录</p>
+<p>下面我们在本机浏览器访问127.0.0.1查看结果(hello是我自己打包带一个镜像，具体看后文构建镜像部分)</p>
+<p><a href="https://imgchr.com/i/D1a9h9"><img src="https://s3.ax1x.com/2020/11/21/D1a9h9.png" alt="D1a9h9.png"></a></p>
+<p>可以看到已经成功的启动了nginx服务</p>
+<h3 id="查看当前运行的容器-docker-ps"><a href="#查看当前运行的容器-docker-ps" class="headerlink" title="查看当前运行的容器(docker ps)"></a>查看当前运行的容器(docker ps)</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker ps</span><br></pre></td></tr></table></figure>
+
+<p>这个命令会列出所有正在运行的容器</p>
+<p><a href="https://imgchr.com/i/D1aV0O"><img src="https://s3.ax1x.com/2020/11/21/D1aV0O.png" alt="D1aV0O.png"></a></p>
+<p>如果输入</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker ps -a</span><br></pre></td></tr></table></figure>
+
+<p>那么会列出所有的容器，包括停止的</p>
+<h3 id="停止容器"><a href="#停止容器" class="headerlink" title="停止容器"></a>停止容器</h3><p>首先，利用ps命令查看当前运行的镜像</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker ps</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://imgchr.com/i/D1aV0O"><img src="https://s3.ax1x.com/2020/11/21/D1aV0O.png" alt="D1aV0O.png"></a></p>
+<p>然后，我们结束掉hello-nginx这个容器</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker stop hello-nginx</span><br></pre></td></tr></table></figure>
+
+<p>命令执行后，这个容器就被关掉了，然后再次访问127.0.0.1，也无法获得服务了</p>
+<h3 id="启动容器"><a href="#启动容器" class="headerlink" title="启动容器"></a>启动容器</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker start 容器名</span><br></pre></td></tr></table></figure>
+
+<p>例如：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker start hello-nginx </span><br></pre></td></tr></table></figure>
+
+<p>这样的话刚刚关闭的这个nginx容器就又重新启动了，访问127.0.0.1又可以获得服务了</p>
+</li>
+</ul>
+</li>
+</ol>
+<h3 id="连接到容器-docker-attach"><a href="#连接到容器-docker-attach" class="headerlink" title="连接到容器(docker attach)"></a>连接到容器(docker attach)</h3><p>首先，如果我们进入了一个容器的shell，那么我们可以使用exit来退出容器，这样的话容器也会终止。但是我们可以一次输入Ctrl+P , Ctrl+Q，这样的话就可以退出容器但容器还正常运行。</p>
+<p>此时，如果我们想重新连接到容器的话，可以输入一下命令：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker attach 容器名</span><br></pre></td></tr></table></figure>
+
+<h3 id="外部执行容器内部命令-docker-exec"><a href="#外部执行容器内部命令-docker-exec" class="headerlink" title="外部执行容器内部命令(docker exec)"></a>外部执行容器内部命令(docker exec)</h3><p>如果容器正在运行的话，可以使用exec命令来从外部执行容器的命令，而无需连接到容器的shell</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker <span class="built_in">exec</span> hello-nginx ls</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://imgchr.com/i/D1dIRs"><img src="https://s3.ax1x.com/2020/11/21/D1dIRs.png" alt="D1dIRs.png"></a></p>
+<h3 id="删除容器-docker-rm"><a href="#删除容器-docker-rm" class="headerlink" title="删除容器(docker rm)"></a>删除容器(docker rm)</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker rm 容器名</span><br></pre></td></tr></table></figure>
+
+<h3 id="删除镜像-docker-rmi"><a href="#删除镜像-docker-rmi" class="headerlink" title="删除镜像(docker rmi)"></a>删除镜像(docker rmi)</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker rmi 镜像名:标签</span><br></pre></td></tr></table></figure>
+
+<h2 id="镜像操作"><a href="#镜像操作" class="headerlink" title="镜像操作"></a>镜像操作</h2><h3 id="查看镜像历史"><a href="#查看镜像历史" class="headerlink" title="查看镜像历史"></a>查看镜像历史</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker <span class="built_in">history</span> 镜像名:标签</span><br></pre></td></tr></table></figure>
+
+<p>使用history命令可以查看指定镜像的构建历史，对应的每一层镜像是怎么构建出来的。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker <span class="built_in">history</span> hello-nginx:0.1</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://imgchr.com/i/D8FuNQ"><img src="https://s3.ax1x.com/2020/11/22/D8FuNQ.png" alt="D8FuNQ.png"></a></p>
+<h3 id="从容器内复制文件"><a href="#从容器内复制文件" class="headerlink" title="从容器内复制文件"></a>从容器内复制文件</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker cp 容器名:容器内路径 主机路径 </span><br></pre></td></tr></table></figure>
+
+<p>例如</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker cp hello:/etc/nginx/nginx.conf ./</span><br></pre></td></tr></table></figure>
+
+<p>执行上面的指令后，容器内的nginx.conf将被复制到主机内</p>
+<h3 id="从容器的修改中创建镜像"><a href="#从容器的修改中创建镜像" class="headerlink" title="从容器的修改中创建镜像"></a>从容器的修改中创建镜像</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker commit 选项 容器名 镜像名:标签</span><br></pre></td></tr></table></figure>
+
+<p>例如：</p>
+<p>首先，先创建一个容器,这里以centos镜像为例</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker run -it --name centos_test centos /bin/bash</span><br></pre></td></tr></table></figure>
+
+<p>然后再容器内创建一个文件</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@5e4e3a665f71 /]<span class="comment"># touch test.txt</span></span><br></pre></td></tr></table></figure>
+
+<p>然后输入exit退出容器，接着运行下面的命令来从容器的修改中创建镜像</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker commit -a <span class="string">&quot;zhangkai&quot;</span> -m <span class="string">&quot;test&quot;</span> centos_test centos</span><br></pre></td></tr></table></figure>
+
+<p>这样我们就更新了centos镜像了。</p>
+<h3 id="检查容器中文件的修改"><a href="#检查容器中文件的修改" class="headerlink" title="检查容器中文件的修改"></a>检查容器中文件的修改</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker diff 容器名</span><br></pre></td></tr></table></figure>
+
+<p>此命令可以对比容器和创建容器的镜像的文件差异。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker diff centos_test</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://imgchr.com/i/D8EkcR"><img src="https://s3.ax1x.com/2020/11/22/D8EkcR.png" alt="D8EkcR.png"></a></p>
+<p>A为添加的文件，C为修改的文件，D为删除的文件</p>
+<h3 id="查看容器详细信息"><a href="#查看容器详细信息" class="headerlink" title="查看容器详细信息"></a>查看容器详细信息</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker inspect 容器名</span><br></pre></td></tr></table></figure>
+
+<p>此命令显示容器和镜像的详细信息</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker inspect centos_test</span><br></pre></td></tr></table></figure>
+
+<p>部分结果如下：</p>
+<p><a href="https://imgchr.com/i/D8Ea4g"><img src="https://s3.ax1x.com/2020/11/22/D8Ea4g.png" alt="D8Ea4g.png"></a></p>
+<h2 id="构建镜像"><a href="#构建镜像" class="headerlink" title="构建镜像"></a>构建镜像</h2><h3 id="基本流程"><a href="#基本流程" class="headerlink" title="基本流程"></a>基本流程</h3><p>通过编写Dockerfile的形式可以构建镜像。下面就以搭建一个nginx服务器为例演示一下。</p>
+<figure class="highlight dockerfile"><table><tr><td class="code"><pre><span class="line"><span class="keyword">FROM</span> ubuntu:<span class="number">18.04</span></span><br><span class="line"><span class="keyword">MAINTAINER</span> Foo Bar &lt;foo@bar.com&gt;</span><br><span class="line"></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> apt update</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> apt install -y nginx</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> <span class="built_in">echo</span> <span class="string">&quot;\ndaemon off;&quot;</span> &gt;&gt; /etc/nginx/nginx.conf</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> chown -R www-data:www-data /var/lib/nginx</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">VOLUME</span><span class="bash"> [<span class="string">&quot;/data&quot;</span>, <span class="string">&quot;/etc/nginx/site-enabled&quot;</span>, <span class="string">&quot;/var/log/nginx&quot;</span>]</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">WORKDIR</span><span class="bash"> /etc/nginx</span></span><br><span class="line"><span class="keyword">CMD</span><span class="bash"> [<span class="string">&quot;nginx&quot;</span>]</span></span><br><span class="line"><span class="keyword">EXPOSE</span> <span class="number">80</span></span><br><span class="line"><span class="keyword">EXPOSE</span> <span class="number">443</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>FROM:表示该镜像基于那个基础镜像构建。指令格式为：</p>
+  <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">FROM 镜像名称:标签</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>MAINTAINER:指定镜像的维护者信息</p>
+</li>
+<li><p>RUN：运行shell脚本或者命令。</p>
+</li>
+<li><p>CMD：指定容器启动时执行的文件或shell脚本</p>
+</li>
+<li><p>WORKDIR：为CMD中设置的可执行文件设置运行目录</p>
+</li>
+<li><p>EXPOSE：与主机相连的端口号</p>
+</li>
+</ul>
+<p>在编写完Dockerfile之后，就可以利用该文件来构建镜像。命令格式如下：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker build 选项 Dockerfile路径</span><br></pre></td></tr></table></figure>
+
+<p>例如：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker build --tag hello:0.1 .</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>–tag指定镜像的名字和标签，若只设置镜像名称，镜像标签就为latest</li>
+</ul>
+<p>在创建完毕后，就可以docker run来运行镜像。</p>
+<h3 id="构建指令"><a href="#构建指令" class="headerlink" title="构建指令"></a>构建指令</h3><h4 id="Build-上下文的概念"><a href="#Build-上下文的概念" class="headerlink" title="Build 上下文的概念"></a>Build 上下文的概念</h4><p>在使用 docker build 命令通过 Dockerfile 创建镜像时，会产生一个 build 上下文(context)。所谓的 build 上下文就是 docker build 命令的 PATH 或 URL 指定的路径中的文件的集合。在镜像 build 过程中可以引用上下文中的任何文件，比如我们要介绍的 COPY 和 ADD 命令，就可以引用上下文中的文件。</p>
+<p>默认情况下 docker build -t testx . 命令中的 . 表示 build 上下文为当前目录。当然我们可以指定一个目录作为上下文，比如下面的命令：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker build -t testx /home/nick/hc</span><br></pre></td></tr></table></figure>
+
+<p>我们指定 /home/nick/hc 目录为 build 上下文，默认情况下 docker 会使用在上下文的根目录下找到的 Dockerfile 文件。</p>
+<h4 id="FROM指令"><a href="#FROM指令" class="headerlink" title="FROM指令"></a>FROM指令</h4><p>FROM指令用于设置基础镜像，Dockerfile总是以已有镜像为基础，所以必须使用FROM命令。即可只使用镜像名称，也可以同时使用名称和标签。只使用名称时，标签自动为latest。镜像名称不可以省略。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">FROM 镜像名称:标签</span><br></pre></td></tr></table></figure>
+
+<h4 id="MAINTAINER指令"><a href="#MAINTAINER指令" class="headerlink" title="MAINTAINER指令"></a>MAINTAINER指令</h4><p>MAINTAINER指令用于设置镜像的创建者信息，格式自由。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">MAINTAINER 创建者信息</span><br></pre></td></tr></table></figure>
+
+<h4 id="RUN指令"><a href="#RUN指令" class="headerlink" title="RUN指令"></a>RUN指令</h4><p>RUN指令用于在FROM中设置的镜像上面运行脚本或者命令。RUN运行结果会生成新的镜像。</p>
+<p>RUN指令有两种，一种是利用镜像内的/bin/sh程序执行命令，如果镜像内不存在/bin/sh，则无法使用，这时使用方法如下：</p>
+<figure class="highlight dockerfile"><table><tr><td class="code"><pre><span class="line"><span class="keyword">RUN</span><span class="bash"> 命令</span></span><br><span class="line"><span class="comment"># 例如</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> apt install -y nginx</span></span><br></pre></td></tr></table></figure>
+
+<p>第二种方式是不借助shell，直接执行可执行文件，方法如下：</p>
+<figure class="highlight dockerfile"><table><tr><td class="code"><pre><span class="line"><span class="keyword">RUN</span><span class="bash"> [<span class="string">&quot;程序&quot;</span>, <span class="string">&quot;参数一&quot;</span>, <span class="string">&quot;参数二&quot;</span>, <span class="string">&quot;参数N&quot;</span>]</span></span><br><span class="line"><span class="comment"># 例如</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> [<span class="string">&quot;apt&quot;</span>, <span class="string">&quot;install&quot;</span>, <span class="string">&quot;-y&quot;</span>, <span class="string">&quot;nginx&quot;</span>]</span></span><br></pre></td></tr></table></figure>
+
+
+
+<p>每个成功运行的RUN命令都会创建一个镜像，每个RUN的执行结果会被缓存，如果不想使用缓存结果，只需要在docker build命令中加入–no-cache即可</p>
+<h4 id="CMD指令"><a href="#CMD指令" class="headerlink" title="CMD指令"></a>CMD指令</h4><p>CMD指令用于设置容器启动时运行的脚本或者命令，即使用docker run 或者docker start时会执行的命令。在Dockerile文件中CMD命令只能使用一次。CMD的语法和RUN命令一样，就不重复了。</p>
+<h4 id="ENTRYPOINT指令："><a href="#ENTRYPOINT指令：" class="headerlink" title="ENTRYPOINT指令："></a>ENTRYPOINT指令：</h4><p>ENTRYPOINT的使用方法和CMD一样，功能也一样，都是用于设置容器启动时运行的脚本或者命令。二者的不同在于：</p>
+<ul>
+<li><p>在shell写法下，如果存在ENTRYPOINT 指令，那么CMD命令和docker run后面输入的指令都不会执行，会强制执行ENTRYPOINT后面的指令</p>
+</li>
+<li><p>在exec写法下，如果在ENTRYPOINT前面有CMD，那么CMD数组中的所有元素都会被当做ENTRYPOINT的参数，例如：</p>
+  <figure class="highlight dockerfile"><table><tr><td class="code"><pre><span class="line"><span class="keyword">CMD</span><span class="bash"> [<span class="string">&quot;hello&quot;</span>]</span></span><br><span class="line"><span class="keyword">ENTRYPOINT</span><span class="bash"> [<span class="string">&quot;echo&quot;</span>]</span></span><br></pre></td></tr></table></figure>
+
+<p>  以上两句会输出一个”hello”字符串</p>
+</li>
+</ul>
+<h4 id="EXPOSE指令"><a href="#EXPOSE指令" class="headerlink" title="EXPOSE指令"></a>EXPOSE指令</h4><p>EXPOSE指令用来声明容器暴露出的端口，但并不会直接打开这些端口。他只是为了告诉别人容器中用到了哪些端口。如果想要在宿主机上访问这些端口，还需要通过docker -p 来映射端口。另外，当利用docker -P时，也会将EXPOSE的端口随机映射。</p>
+<h4 id="ENV指令"><a href="#ENV指令" class="headerlink" title="ENV指令"></a>ENV指令</h4><p>ENV指令用于设置环境变量。使用ENV设置的环境变量适用于RUN，CMD，ENTRYPOINT</p>
+<figure class="highlight dockerfile"><table><tr><td class="code"><pre><span class="line"><span class="keyword">ENV</span> 环境变量 值</span><br><span class="line"><span class="keyword">ENV</span> GOPATH /go <span class="comment"># 设置GOPATH变量的值为/go</span></span><br><span class="line"><span class="keyword">ENV</span> PATH /go/bin:$PATH <span class="comment">#在PATH变量前面加上/go/bin:</span></span><br></pre></td></tr></table></figure>
+
+<p>在ENV设置完变量后，上述三个命令就可以访问了</p>
+<figure class="highlight dockerfile"><table><tr><td class="code"><pre><span class="line"><span class="keyword">ENV</span> GOPATH /go <span class="comment"># 设置GOPATH变量的值为/go</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> <span class="built_in">echo</span> <span class="variable">$GOPATH</span></span></span><br></pre></td></tr></table></figure>
+
+<p>上面两句会打印出/go这个字符串</p>
+<h4 id="COPY指令"><a href="#COPY指令" class="headerlink" title="COPY指令"></a>COPY指令</h4><p>COPY指令会简单的将文件复制到镜像中。</p>
+<figure class="highlight dockerfile"><table><tr><td class="code"><pre><span class="line"><span class="keyword">COPY</span><span class="bash"> 要复制的文件的路径 文件要复制到镜像中的路径</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>要复制的文件的路径要以上下文</li>
+<li>要复制的文件的路径不能设置为网络URL</li>
+<li>要复制的文件的路径可以为目录。当设置为目录时，会复制目录下所有文件，另外也可以使用通配符复制特定文件</li>
+<li>文件要复制到镜像中的路径需要是绝对路径</li>
+<li>添加当前目录时，.dockerignore文件中设置的文件和目录会被忽略</li>
+</ul>
+<h4 id="ADD指令"><a href="#ADD指令" class="headerlink" title="ADD指令"></a>ADD指令</h4><p>ADD指令也用于向镜像中添加文件。下面列举和COPY的不同</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">ADD 要复制的文件的路径 文件要复制到镜像中的路径</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>要复制的文件的路径</strong>可以为网络路径。</li>
+</ul>
+<figure class="highlight dockerfile"><table><tr><td class="code"><pre><span class="line"><span class="keyword">ADD</span><span class="bash"> http://example.com/hello.sh /home/hello.sh</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>如果<strong>要复制的文件</strong>为压缩包时，ADD指令会自动解压缩并添加。但是如果从网络中下载一个压缩包时，不会解压缩。</li>
+</ul>
+<h4 id="VOLUME指令"><a href="#VOLUME指令" class="headerlink" title="VOLUME指令"></a>VOLUME指令</h4><p>VOLUME指令可以讲容器中的目录挂载到本机的目录上，这样容器中写入数据时就可以直接存储到宿主机上。</p>
+<figure class="highlight dockerfile"><table><tr><td class="code"><pre><span class="line"><span class="keyword">VOLUME</span><span class="bash"> 容器中的路径 <span class="comment">#方式一</span></span></span><br><span class="line"><span class="keyword">VOLUME</span><span class="bash"> [<span class="string">&quot;容器中的路径&quot;</span>,  <span class="string">&quot;宿主机中的路径&quot;</span>] <span class="comment">#方式二</span></span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>方式一这里的 /data 目录就会在运行时自动挂载为匿名卷，任何向 /data 中写入的信息都不会记录进容器存储层，从而保证了容器存储层的无状态化。当然，运行时可以覆盖这个挂载设置。比如：</p>
+  <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker run -d -v mydata:/data 镜像名</span><br></pre></td></tr></table></figure>
+
+<p>  在这行命令中，就使用了 mydata 这个命名卷挂载到了 /data 这个位置，替代了 Dockerfile 中定义的匿名卷的挂载配置。</p>
+</li>
+<li><p>方式二会将容器中的路径挂载到宿主机中的路径。这样向容器中的目录就和宿主机中的目录共享了。</p>
+</li>
+</ul>
+<h4 id="USER指令"><a href="#USER指令" class="headerlink" title="USER指令"></a>USER指令</h4><p>USER指令用于设置运行命令的用户。用于RUN， CMD， ENTRYPOINT</p>
+<figure class="highlight dockerfile"><table><tr><td class="code"><pre><span class="line"><span class="keyword">USER</span> root</span><br></pre></td></tr></table></figure>
+
+<p>USER后面所有的RUN，CMD，ENTRYPOINT都会得到应用。中间可以使用USER命令更换用户</p>
+<h4 id="WORKDIR指令"><a href="#WORKDIR指令" class="headerlink" title="WORKDIR指令"></a>WORKDIR指令</h4><p>WORKDIR指令用于设置RUN，CMD，ENTRYPOINT命令的目录。</p>
+<figure class="highlight dockerfile"><table><tr><td class="code"><pre><span class="line"><span class="keyword">WORKDIR</span><span class="bash"> 路径</span></span><br></pre></td></tr></table></figure>
+
+<p>WORKDIR指令对之后的RUN，CMD，ENTRYPOINT都生效，中间可以用WORKDIR命令更换目录。</p>
+<p>WORKDIR指令也可以使用相对路径，最初相对的路径为/，之后每次相对的都是之前的路径</p>
+<figure class="highlight dockerfile"><table><tr><td class="code"><pre><span class="line"><span class="keyword">WORKDIR</span><span class="bash"> var <span class="comment"># 此时路径为/var</span></span></span><br><span class="line"><span class="keyword">WORKDIR</span><span class="bash"> www <span class="comment"># 此时路径为/var/www</span></span></span><br></pre></td></tr></table></figure>
+
+<h4 id="ONBUILD指令"><a href="#ONBUILD指令" class="headerlink" title="ONBUILD指令"></a>ONBUILD指令</h4><p>如果以当前镜像作为基础镜像时，ONBUILD就会在引用次镜像的Dockerfile的FROM指令后执行ONBUILD指令。</p>
+<figure class="highlight dockerfile"><table><tr><td class="code"><pre><span class="line"><span class="keyword">ONBUILD</span> <span class="keyword">RUN</span><span class="bash"> touch hello.txt</span></span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <categories>
+        <category>docker</category>
+      </categories>
+      <tags>
+        <tag>docker</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Hello World</title>
+    <url>/2020/11/10/hello-world/</url>
+    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
+<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post1&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
+<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
+<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
+<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+]]></content>
+  </entry>
+  <entry>
+    <title>Springboot环境搭建</title>
+    <url>/2020/11/10/Springboot%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/</url>
+    <content><![CDATA[<h1 id="springboot开发环境搭建"><a href="#springboot开发环境搭建" class="headerlink" title="springboot开发环境搭建"></a>springboot开发环境搭建</h1><h2 id="IDEA下springboot环境搭建"><a href="#IDEA下springboot环境搭建" class="headerlink" title="IDEA下springboot环境搭建"></a>IDEA下springboot环境搭建</h2><ol>
+<li><p>首先新建项目，选择<strong>springboot initializr</strong> ,然后下一步，填写一些基本信息后下一步，进入依赖包的选择。这里就根据自己的需要选择需要用到的组件，然后下一步，填写项目名称，完成就好。</p>
+</li>
+<li><p>idea生成项目后，在resource目录下会有一个<strong>application.properties</strong>文件，在此文件里进行springboot的各项配置。例子如下：</p>
+<figure class="highlight properties"><table><tr><td class="code"><pre><span class="line"><span class="meta">server.port</span>=<span class="string">8082</span></span><br><span class="line"><span class="meta">spring.thymeleaf.cache</span>=<span class="string">false</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#datasource</span></span><br><span class="line"><span class="meta">spring.datasource.driver-class-name</span>=<span class="string">com.mysql.jdbc.Driver</span></span><br><span class="line"><span class="meta">spring.datasource.url</span>=<span class="string">jdbc:mysql://localhost:3306/community?characterEncoding=utf-8&amp;useSSL=false&amp;serverTimezone=Hongkong</span></span><br><span class="line"><span class="meta">spring.datasource.username</span>=<span class="string">root</span></span><br><span class="line"><span class="comment">#注意修改密码</span></span><br><span class="line"><span class="meta">spring.datasource.password</span>=<span class="string">123456</span></span><br><span class="line"><span class="meta">spring.datasource.type</span>=<span class="string">com.zaxxer.hikari.HikariDataSource</span></span><br><span class="line"><span class="meta">spring.datasource.hikari.maximum-pool-size</span>=<span class="string">15</span></span><br><span class="line"><span class="meta">spring.datasource.hikari.minimum-idle</span>=<span class="string">5</span></span><br><span class="line"><span class="meta">spring.datasource.hikari.idle-timeout</span>=<span class="string">30000</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#mybatis</span></span><br><span class="line"><span class="meta">mybatis.mapper-locations</span>=<span class="string">classpath:mapper/*.xml</span></span><br><span class="line"><span class="meta">mybatis.type-aliases-package</span>=<span class="string">com.kai.entity</span></span><br><span class="line"><span class="meta">mybatis.configuration.use-generated-keys</span>=<span class="string">true</span></span><br><span class="line"><span class="meta">mybatis.configuration.map-underscore-to-camel-case</span>=<span class="string">true</span></span><br></pre></td></tr></table></figure>
+<p> 项目的目录结构如下：<br> <img src="https://s2.ax1x.com/2019/10/05/urxXwT.png" alt="urxXwT.png"></p>
+</li>
+<li><p>pom.xml文件的配置</p>
+<p>在新建项目的时候，如果没有引入mybatis，那么在引入mybatis时需要引入两个包，分别为mybatis-spring-boot-starter和mysql-connector-java，配置如下</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="comment">&lt;!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>mysql<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>mysql-connector-java<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>5.1.47<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="comment">&lt;!-- https://mvnrepository.com/artifact/org.mybatis.spring.boot/mybatis-spring-boot-starter --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.mybatis.spring.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>mybatis-spring-boot-starter<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.1.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ol>
+<h2 id="错误排除"><a href="#错误排除" class="headerlink" title="错误排除"></a>错误排除</h2><ol>
+<li><p>idea找不到或无法加载主类</p>
+<p>解决方案：在.idea文件夹中找到worksspace.xml，修改其中的SRPING_MAIN_CLASS为我们的入口类，可能需要重启idea</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">configuration</span> <span class="attr">name</span>=<span class="string">&quot;KaiApplication&quot;</span> <span class="attr">type</span>=<span class="string">&quot;SpringBootApplicationConfigurationType&quot;</span> <span class="attr">factoryName</span>=<span class="string">&quot;Spring Boot&quot;</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">module</span> <span class="attr">name</span>=<span class="string">&quot;springboot1&quot;</span> /&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">option</span> <span class="attr">name</span>=<span class="string">&quot;SPRING_BOOT_MAIN_CLASS&quot;</span> <span class="attr">value</span>=<span class="string">&quot;com.kai.KaiApplication&quot;</span> /&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">method</span> <span class="attr">v</span>=<span class="string">&quot;2&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">option</span> <span class="attr">name</span>=<span class="string">&quot;Make&quot;</span> <span class="attr">enabled</span>=<span class="string">&quot;true&quot;</span> /&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">method</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>对于提示Java版本不对，可以在pom.xml中加入这条：</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">properties</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">java.version</span>&gt;</span>12<span class="tag">&lt;/<span class="name">java.version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">properties</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+</li>
+</ol>
+<h2 id="注：重要的文档"><a href="#注：重要的文档" class="headerlink" title="注：重要的文档"></a>注：重要的文档</h2><p>springboot的配置在官网有详细的文档：<a href="https://spring.io/projects/spring-boot#learn">官网文档链接</a></p>
+]]></content>
+      <categories>
+        <category>Springboot</category>
+      </categories>
+      <tags>
+        <tag>javaweb</tag>
+        <tag>Springboot</tag>
+        <tag>环境搭建</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>springboot异常处理</title>
+    <url>/2020/11/10/springboot%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86/</url>
+    <content><![CDATA[<h1 id="springboot异常处理"><a href="#springboot异常处理" class="headerlink" title="springboot异常处理"></a>springboot异常处理</h1><h3 id="对于http错误状态码的默认处理"><a href="#对于http错误状态码的默认处理" class="headerlink" title="对于http错误状态码的默认处理"></a>对于http错误状态码的默认处理</h3><p>对于http状态码，springboot自动配置了一个简易的处理方法。在templates文件夹下面建立一个名为<strong>error</strong>的文件夹，然后在里面放入文件名格式为“状态码.html”的文件，当发生对应的错误时，springboot就会帮助我们自动返回相应的页面。</p>
+<p><img src="https://s2.ax1x.com/2019/10/07/u2mKIS.png" alt="u2mKIS.png"></p>
+<h3 id="利用-ControllerAdvice注解进行异常处理"><a href="#利用-ControllerAdvice注解进行异常处理" class="headerlink" title="利用@ControllerAdvice注解进行异常处理"></a>利用@ControllerAdvice注解进行异常处理</h3><p>当控制器出现异常的时候，@ControllerAdvice注解可以对Controller进行拦截。具体使用方法如下：</p>
+<p>我们首先新建一个类<strong>ExceptionAdvice</strong>，并且加上@ControllerAdvice注解。具体实现如下：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">	<span class="meta">@ControllerAdvice(annotations = Controller.class)</span></span><br><span class="line">	<span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ExceptionAdvice</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Logger logger = LoggerFactory.getLogger(ExceptionAdvice.class);</span><br><span class="line"></span><br><span class="line">    <span class="meta">@ExceptionHandler(&#123;Exception.class&#125;)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handleException</span><span class="params">(Exception e, HttpServletRequest request, 			            HttpServletResponse response)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        logger.error(<span class="string">&quot;服务器发生异常: &quot;</span> + e.getMessage());</span><br><span class="line">        <span class="keyword">for</span> (StackTraceElement element : e.getStackTrace()) &#123;</span><br><span class="line">            logger.error(element.toString());</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        String xRequestedWith = request.getHeader(<span class="string">&quot;x-requested-with&quot;</span>);</span><br><span class="line">        <span class="keyword">if</span> (<span class="string">&quot;XMLHttpRequest&quot;</span>.equals(xRequestedWith)) &#123;</span><br><span class="line">            response.setContentType(<span class="string">&quot;application/plain;charset=utf-8&quot;</span>);</span><br><span class="line">            PrintWriter writer = response.getWriter();</span><br><span class="line">            writer.write(CommunityUtil.getJSONString(<span class="number">1</span>, <span class="string">&quot;服务器异常!&quot;</span>));</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            response.sendRedirect(request.getContextPath() + <span class="string">&quot;/error&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<pre><code>首先，**@ControllerAdvice(annotations = Controller.class)**说明只对被Controller注解标记的方法进行拦截。然后我们在**ExceptionAdvice**里面实现了**handleException**方法，方法名可以随便起，但是一定是public void，并且被**@ExceptionHandler**注解修饰。**@ExceptionHandler(&#123;Exception.class&#125;)**的参数为这个方法拦截的异常类型，这里我们用**Exception.class**表示拦截所有的异常。**ExceptionAdvice**的参数是spring自动为我们传入的，我们一般用这三个参数就够用了。
+
+然后，在**handleException**方法内，我们还需要对请求头进行判断，来确定是正常的get请求还是ajax请求。在这里，我们读取request的**x-requested-with**头，来判断请求类型。根据不同的请求类型来返回不同的行为，如果请求 是Ajax，我们直接获取输出流，对客户端浏览器进行写入json字符串。如果请求是正常请求，则重定向到错误界面。</code></pre>
+<p>​    </p>
+]]></content>
+      <categories>
+        <category>Springboot</category>
+      </categories>
+      <tags>
+        <tag>Springboot</tag>
+        <tag>异常处理</tag>
+      </tags>
+  </entry>
+</search>
