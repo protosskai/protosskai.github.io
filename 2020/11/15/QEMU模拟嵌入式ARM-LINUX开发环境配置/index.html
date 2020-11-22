@@ -135,9 +135,9 @@
     <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
 
   </li>
-        <li class="menu-item menu-item-关于">
+        <li class="menu-item menu-item-专栏">
 
-    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>专栏</a>
 
   </li>
         <li class="menu-item menu-item-标签">
@@ -145,14 +145,14 @@
     <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
 
   </li>
-        <li class="menu-item menu-item-专栏">
-
-    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>专栏</a>
-
-  </li>
         <li class="menu-item menu-item-文章">
 
     <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>文章</a>
+
+  </li>
+        <li class="menu-item menu-item-关于">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
 
   </li>
   </ul>
@@ -228,6 +228,13 @@
             </span>
 
           
+            <span id="/2020/11/15/QEMU%E6%A8%A1%E6%8B%9F%E5%B5%8C%E5%85%A5%E5%BC%8FARM-LINUX%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE/" class="post-meta-item leancloud_visitors" data-flag-title="QEMU模拟嵌入式ARM LINUX开发环境配置" title="Views">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
   
   <span class="post-meta-item">
     
@@ -551,10 +558,10 @@ NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
       avatar     : 'mm',
       meta       : guest,
       pageSize   : '10' || 10,
-      visitor    : false,
+      visitor    : true,
       lang       : '' || 'zh-cn',
       path       : location.pathname,
-      recordIP   : false,
+      recordIP   : true,
       serverURLs : ''
     });
   }, window.Valine);
