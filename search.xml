@@ -646,6 +646,51 @@
       </tags>
   </entry>
   <entry>
+    <title>Springboot环境搭建</title>
+    <url>/2020/11/10/Springboot%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/</url>
+    <content><![CDATA[<h1 id="springboot开发环境搭建"><a href="#springboot开发环境搭建" class="headerlink" title="springboot开发环境搭建"></a>springboot开发环境搭建</h1><h2 id="IDEA下springboot环境搭建"><a href="#IDEA下springboot环境搭建" class="headerlink" title="IDEA下springboot环境搭建"></a>IDEA下springboot环境搭建</h2><ol>
+<li><p>首先新建项目，选择<strong>springboot initializr</strong> ,然后下一步，填写一些基本信息后下一步，进入依赖包的选择。这里就根据自己的需要选择需要用到的组件，然后下一步，填写项目名称，完成就好。</p>
+</li>
+<li><p>idea生成项目后，在resource目录下会有一个<strong>application.properties</strong>文件，在此文件里进行springboot的各项配置。例子如下：</p>
+<figure class="highlight properties"><table><tr><td class="code"><pre><span class="line"><span class="meta">server.port</span>=<span class="string">8082</span></span><br><span class="line"><span class="meta">spring.thymeleaf.cache</span>=<span class="string">false</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#datasource</span></span><br><span class="line"><span class="meta">spring.datasource.driver-class-name</span>=<span class="string">com.mysql.jdbc.Driver</span></span><br><span class="line"><span class="meta">spring.datasource.url</span>=<span class="string">jdbc:mysql://localhost:3306/community?characterEncoding=utf-8&amp;useSSL=false&amp;serverTimezone=Hongkong</span></span><br><span class="line"><span class="meta">spring.datasource.username</span>=<span class="string">root</span></span><br><span class="line"><span class="comment">#注意修改密码</span></span><br><span class="line"><span class="meta">spring.datasource.password</span>=<span class="string">123456</span></span><br><span class="line"><span class="meta">spring.datasource.type</span>=<span class="string">com.zaxxer.hikari.HikariDataSource</span></span><br><span class="line"><span class="meta">spring.datasource.hikari.maximum-pool-size</span>=<span class="string">15</span></span><br><span class="line"><span class="meta">spring.datasource.hikari.minimum-idle</span>=<span class="string">5</span></span><br><span class="line"><span class="meta">spring.datasource.hikari.idle-timeout</span>=<span class="string">30000</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#mybatis</span></span><br><span class="line"><span class="meta">mybatis.mapper-locations</span>=<span class="string">classpath:mapper/*.xml</span></span><br><span class="line"><span class="meta">mybatis.type-aliases-package</span>=<span class="string">com.kai.entity</span></span><br><span class="line"><span class="meta">mybatis.configuration.use-generated-keys</span>=<span class="string">true</span></span><br><span class="line"><span class="meta">mybatis.configuration.map-underscore-to-camel-case</span>=<span class="string">true</span></span><br></pre></td></tr></table></figure>
+<p> 项目的目录结构如下：<br> <img src="https://s2.ax1x.com/2019/10/05/urxXwT.png" alt="urxXwT.png"></p>
+</li>
+<li><p>pom.xml文件的配置</p>
+<p>在新建项目的时候，如果没有引入mybatis，那么在引入mybatis时需要引入两个包，分别为mybatis-spring-boot-starter和mysql-connector-java，配置如下</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="comment">&lt;!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>mysql<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>mysql-connector-java<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>5.1.47<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="comment">&lt;!-- https://mvnrepository.com/artifact/org.mybatis.spring.boot/mybatis-spring-boot-starter --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.mybatis.spring.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>mybatis-spring-boot-starter<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.1.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ol>
+<h2 id="错误排除"><a href="#错误排除" class="headerlink" title="错误排除"></a>错误排除</h2><ol>
+<li><p>idea找不到或无法加载主类</p>
+<p>解决方案：在.idea文件夹中找到worksspace.xml，修改其中的SRPING_MAIN_CLASS为我们的入口类，可能需要重启idea</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">configuration</span> <span class="attr">name</span>=<span class="string">&quot;KaiApplication&quot;</span> <span class="attr">type</span>=<span class="string">&quot;SpringBootApplicationConfigurationType&quot;</span> <span class="attr">factoryName</span>=<span class="string">&quot;Spring Boot&quot;</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">module</span> <span class="attr">name</span>=<span class="string">&quot;springboot1&quot;</span> /&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">option</span> <span class="attr">name</span>=<span class="string">&quot;SPRING_BOOT_MAIN_CLASS&quot;</span> <span class="attr">value</span>=<span class="string">&quot;com.kai.KaiApplication&quot;</span> /&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">method</span> <span class="attr">v</span>=<span class="string">&quot;2&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">option</span> <span class="attr">name</span>=<span class="string">&quot;Make&quot;</span> <span class="attr">enabled</span>=<span class="string">&quot;true&quot;</span> /&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">method</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>对于提示Java版本不对，可以在pom.xml中加入这条：</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">properties</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">java.version</span>&gt;</span>12<span class="tag">&lt;/<span class="name">java.version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">properties</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+</li>
+</ol>
+<h2 id="注：重要的文档"><a href="#注：重要的文档" class="headerlink" title="注：重要的文档"></a>注：重要的文档</h2><p>springboot的配置在官网有详细的文档：<a href="https://spring.io/projects/spring-boot#learn">官网文档链接</a></p>
+]]></content>
+      <categories>
+        <category>Springboot</category>
+      </categories>
+      <tags>
+        <tag>javaweb</tag>
+        <tag>Springboot</tag>
+        <tag>环境搭建</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>docker基本使用</title>
     <url>/2020/11/21/docker%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8/</url>
     <content><![CDATA[<h1 id="docker基本使用"><a href="#docker基本使用" class="headerlink" title="docker基本使用"></a>docker基本使用</h1><h2 id="基本操作"><a href="#基本操作" class="headerlink" title="基本操作"></a>基本操作</h2><p>使用docker的时候必须使用root权限。所以在使用前，最好将使用docker的用户加入到<strong>docker</strong>这个用户组（docker用户组和root的权限一样）</p>
@@ -896,69 +941,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Hello World</title>
-    <url>/2020/11/10/hello-world/</url>
-    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post1&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
-]]></content>
-  </entry>
-  <entry>
-    <title>Springboot环境搭建</title>
-    <url>/2020/11/10/Springboot%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/</url>
-    <content><![CDATA[<h1 id="springboot开发环境搭建"><a href="#springboot开发环境搭建" class="headerlink" title="springboot开发环境搭建"></a>springboot开发环境搭建</h1><h2 id="IDEA下springboot环境搭建"><a href="#IDEA下springboot环境搭建" class="headerlink" title="IDEA下springboot环境搭建"></a>IDEA下springboot环境搭建</h2><ol>
-<li><p>首先新建项目，选择<strong>springboot initializr</strong> ,然后下一步，填写一些基本信息后下一步，进入依赖包的选择。这里就根据自己的需要选择需要用到的组件，然后下一步，填写项目名称，完成就好。</p>
-</li>
-<li><p>idea生成项目后，在resource目录下会有一个<strong>application.properties</strong>文件，在此文件里进行springboot的各项配置。例子如下：</p>
-<figure class="highlight properties"><table><tr><td class="code"><pre><span class="line"><span class="meta">server.port</span>=<span class="string">8082</span></span><br><span class="line"><span class="meta">spring.thymeleaf.cache</span>=<span class="string">false</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#datasource</span></span><br><span class="line"><span class="meta">spring.datasource.driver-class-name</span>=<span class="string">com.mysql.jdbc.Driver</span></span><br><span class="line"><span class="meta">spring.datasource.url</span>=<span class="string">jdbc:mysql://localhost:3306/community?characterEncoding=utf-8&amp;useSSL=false&amp;serverTimezone=Hongkong</span></span><br><span class="line"><span class="meta">spring.datasource.username</span>=<span class="string">root</span></span><br><span class="line"><span class="comment">#注意修改密码</span></span><br><span class="line"><span class="meta">spring.datasource.password</span>=<span class="string">123456</span></span><br><span class="line"><span class="meta">spring.datasource.type</span>=<span class="string">com.zaxxer.hikari.HikariDataSource</span></span><br><span class="line"><span class="meta">spring.datasource.hikari.maximum-pool-size</span>=<span class="string">15</span></span><br><span class="line"><span class="meta">spring.datasource.hikari.minimum-idle</span>=<span class="string">5</span></span><br><span class="line"><span class="meta">spring.datasource.hikari.idle-timeout</span>=<span class="string">30000</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#mybatis</span></span><br><span class="line"><span class="meta">mybatis.mapper-locations</span>=<span class="string">classpath:mapper/*.xml</span></span><br><span class="line"><span class="meta">mybatis.type-aliases-package</span>=<span class="string">com.kai.entity</span></span><br><span class="line"><span class="meta">mybatis.configuration.use-generated-keys</span>=<span class="string">true</span></span><br><span class="line"><span class="meta">mybatis.configuration.map-underscore-to-camel-case</span>=<span class="string">true</span></span><br></pre></td></tr></table></figure>
-<p> 项目的目录结构如下：<br> <img src="https://s2.ax1x.com/2019/10/05/urxXwT.png" alt="urxXwT.png"></p>
-</li>
-<li><p>pom.xml文件的配置</p>
-<p>在新建项目的时候，如果没有引入mybatis，那么在引入mybatis时需要引入两个包，分别为mybatis-spring-boot-starter和mysql-connector-java，配置如下</p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="comment">&lt;!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>mysql<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>mysql-connector-java<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>5.1.47<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="comment">&lt;!-- https://mvnrepository.com/artifact/org.mybatis.spring.boot/mybatis-spring-boot-starter --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.mybatis.spring.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>mybatis-spring-boot-starter<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.1.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-
-
-</li>
-</ol>
-<h2 id="错误排除"><a href="#错误排除" class="headerlink" title="错误排除"></a>错误排除</h2><ol>
-<li><p>idea找不到或无法加载主类</p>
-<p>解决方案：在.idea文件夹中找到worksspace.xml，修改其中的SRPING_MAIN_CLASS为我们的入口类，可能需要重启idea</p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">configuration</span> <span class="attr">name</span>=<span class="string">&quot;KaiApplication&quot;</span> <span class="attr">type</span>=<span class="string">&quot;SpringBootApplicationConfigurationType&quot;</span> <span class="attr">factoryName</span>=<span class="string">&quot;Spring Boot&quot;</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">module</span> <span class="attr">name</span>=<span class="string">&quot;springboot1&quot;</span> /&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">option</span> <span class="attr">name</span>=<span class="string">&quot;SPRING_BOOT_MAIN_CLASS&quot;</span> <span class="attr">value</span>=<span class="string">&quot;com.kai.KaiApplication&quot;</span> /&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">method</span> <span class="attr">v</span>=<span class="string">&quot;2&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">option</span> <span class="attr">name</span>=<span class="string">&quot;Make&quot;</span> <span class="attr">enabled</span>=<span class="string">&quot;true&quot;</span> /&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">method</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p>对于提示Java版本不对，可以在pom.xml中加入这条：</p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">properties</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">java.version</span>&gt;</span>12<span class="tag">&lt;/<span class="name">java.version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">properties</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-
-
-
-
-
-
-</li>
-</ol>
-<h2 id="注：重要的文档"><a href="#注：重要的文档" class="headerlink" title="注：重要的文档"></a>注：重要的文档</h2><p>springboot的配置在官网有详细的文档：<a href="https://spring.io/projects/spring-boot#learn">官网文档链接</a></p>
-]]></content>
-      <categories>
-        <category>Springboot</category>
-      </categories>
-      <tags>
-        <tag>javaweb</tag>
-        <tag>Springboot</tag>
-        <tag>环境搭建</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>springboot异常处理</title>
     <url>/2020/11/10/springboot%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86/</url>
     <content><![CDATA[<h1 id="springboot异常处理"><a href="#springboot异常处理" class="headerlink" title="springboot异常处理"></a>springboot异常处理</h1><h3 id="对于http错误状态码的默认处理"><a href="#对于http错误状态码的默认处理" class="headerlink" title="对于http错误状态码的默认处理"></a>对于http错误状态码的默认处理</h3><p>对于http状态码，springboot自动配置了一个简易的处理方法。在templates文件夹下面建立一个名为<strong>error</strong>的文件夹，然后在里面放入文件名格式为“状态码.html”的文件，当发生对应的错误时，springboot就会帮助我们自动返回相应的页面。</p>
@@ -979,5 +961,23 @@
         <tag>Springboot</tag>
         <tag>异常处理</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>Hello World</title>
+    <url>/2020/11/10/hello-world/</url>
+    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
+<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post1&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
+<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
+<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
+<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+]]></content>
   </entry>
 </search>
